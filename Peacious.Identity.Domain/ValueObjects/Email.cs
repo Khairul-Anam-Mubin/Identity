@@ -2,14 +2,12 @@
 
 public record Email
 {
-    public string UserName { get; private set; }
-    public string Domain { get; private set; }
+    public string Address { get; private set; }
     public bool IsVerified { get; private set; }
 
-    private Email(string userName, string domain)
+    private Email(string email)
     {
-        UserName = userName;
-        Domain = domain;
+        Address = email;
         IsVerified = false;
     }
 
@@ -18,25 +16,8 @@ public record Email
         IsVerified = true;
     }
 
-    public string GetEmail()
-    {
-        return $"{UserName}@{Domain}";
-    }
-
-    public string GetUniqueUserName()
-    {
-        var domainNameToInteger = Domain.GetHashCode() % 10000;
-
-        return $"{UserName}{domainNameToInteger}";
-    }
-
     public static Email Create(string email)
     {
-        var splittedEmail = email.Split('@');
-
-        var userName = splittedEmail.First();
-        var domain = splittedEmail.Last();
-
-        return new Email(userName, domain);
+        return new Email(email);
     }
 }

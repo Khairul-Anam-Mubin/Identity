@@ -30,8 +30,7 @@ public class User : Entity, IRepositoryItem
         var name = new Name(firstName, lastName);
         var email = Email.Create(emailAddress);
         var password = Password.Create(plainPassword);
-        var userName = email.GetUniqueUserName();
-
+        var userName = emailAddress;
         var user = new User(name, email, password, userName);
 
         return user;

@@ -25,12 +25,10 @@ public class UserRepository : RepositoryBaseWrapper<User>, IUserRepository
 
     public async Task<bool> IsUserEmailExistAsync(string email)
     {
-        var emailModel = Email.Create(email);
-
         var filterBuilder = new FilterBuilder<User>();
 
-        var userNameCondition = filterBuilder.Eq(user => user.Email.UserName, emailModel.UserName);
-        var domainNameCondition = filterBuilder.Eq(user => user.Email.Domain, emailModel.Domain);
+        var userNameCondition = filterBuilder.Eq(user => user.Email.Address, email);
+        var domainNameCondition = filterBuilder.Eq(user => user.Email.Address, email);
 
         var andCondition = filterBuilder.And(userNameCondition, domainNameCondition);
 

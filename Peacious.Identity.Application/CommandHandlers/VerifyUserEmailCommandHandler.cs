@@ -8,6 +8,6 @@ public class VerifyUserEmailCommandHandler : ICommandHandler<VerifyUserEmailComm
 {
     public async Task<IResult> Handle(VerifyUserEmailCommand request, CancellationToken cancellationToken)
     {
-        return Result.Success("Email verified");
+        return Result.Success("Address verified");
     }
 }

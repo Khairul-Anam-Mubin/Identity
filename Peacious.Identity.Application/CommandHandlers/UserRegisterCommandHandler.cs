@@ -16,12 +16,12 @@ public class UserRegisterCommandHandler(IUserRepository userRepository) : IComma
 
         if (isEmailExist)
         {
-            return Result.Error($"Email : {request.Email} already exist!");
+            return Result.Error($"Address : {request.Email} already exist!");
         }
 
        var user = User.Create(
             request.FirstName, 
-            request.LastName, 
+            request.LastName,
             request.Email, 
             request.Password);
 

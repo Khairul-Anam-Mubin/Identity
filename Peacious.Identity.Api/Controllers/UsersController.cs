@@ -37,7 +37,7 @@ public class UsersController(
     }
 
     [HttpPost]
-    [Route("Email/{email}/Verify")]
+    [Route("Address/{email}/Verify")]
     public async Task<IActionResult> VerifyUserEmailAsync(string email, [FromQuery] string code)
     {
         var command = new VerifyUserEmailCommand(email, code);
