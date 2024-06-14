@@ -7,6 +7,6 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Peacious.Framework" Version="2.2.3" />
+		<PackageReference Include="Peacious.Framework" Version="2.3.0-rc" />
 	</ItemGroup>
 </Project>
