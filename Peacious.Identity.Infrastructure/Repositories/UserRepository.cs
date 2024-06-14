@@ -34,4 +34,13 @@ public class UserRepository : RepositoryBaseWrapper<User>, IUserRepository
 
         return await DbContext.CountAsync<User>(DatabaseInfo, andCondition) > 0;
     }
+
+    public async Task<User?> GetUserByUserNameAsync(string userName)
+    {
+        var filterBuilder = new FilterBuilder<User>();
+
+        var userNameCondition = filterBuilder.Eq(user => user.UserName, userName);
+
+        return await DbContext.GetOneAsync<User>(DatabaseInfo, userNameCondition);
+    }
 }

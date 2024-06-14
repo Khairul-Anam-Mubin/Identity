@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Peacious.Framework.CQRS;
 using Peacious.Identity.Application.Commands;
+using Peacious.Identity.Application.Extensions;
 using Peacious.Identity.Contracts.DTOs;
 
 namespace Peacious.Identity.Api.Controllers;
@@ -36,16 +37,12 @@ public class AuthController(
     [Route("OAuth2/Token")]
     public async Task<IActionResult> CreateTokenAsync(TokenRequest request)
     {
-        var command = new CreateTokenCommand(
-            request.GrantType,
-            request.ClientId,
-            request.UserName,
-            request.Password,
-            request.RefreshToken,
-            request.ClientSecret,
-            request.Code,
-            request.RedirectUri,
-            request.CodeVerifier);
+        var command = request.ToCreateTokenByGrantTypeCommand();
+        
+        if (command is null)
+        {
+            return BadRequest("Grant Type Not Supported.");
+        }
 
         var result = await _commandExecutor.ExecuteAsync(command);
 

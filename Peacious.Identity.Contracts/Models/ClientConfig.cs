@@ -1,4 +1,4 @@
-﻿namespace Peacious.Identity.Contracts;
+﻿namespace Peacious.Identity.Contracts.Models;
 
 public record ClientConfig(
     string ClientName,

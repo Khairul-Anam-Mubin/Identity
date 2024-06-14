@@ -10,5 +10,6 @@ namespace Peacious.Identity.Domain.Repositories;
 
 public interface IUserRepository : IRepository<User>
 {
+    Task<User?> GetUserByUserNameAsync(string userName);
     Task<bool> IsUserEmailExistAsync(string email);
 }

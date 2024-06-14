@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Peacious.Framework.Extensions;
 using Peacious.Framework.ORM.Migrations;
-using Peacious.Identity.Contracts;
+using Peacious.Identity.Contracts.Models;
 using Peacious.Identity.Domain.Entities;
 using Peacious.Identity.Domain.Repositories;
 
