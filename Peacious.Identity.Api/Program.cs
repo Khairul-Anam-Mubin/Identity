@@ -1,20 +1,30 @@
 using Peacious.Framework;
 using Peacious.Framework.Extensions;
+using Peacious.Framework.ORM.Migrations;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var configuration = builder.Configuration;
+#region ServiceRegistration
 
 builder
-    .AddGlobalConfig(configuration.TryGetConfig<string>("GlobalConfigPath"))
-    .AddAllAssembliesByAssemblyPrefix(configuration.TryGetConfig<string>("AssemblyPrefix"))
+    .AddCustomConfigurationJsonFile(builder.Configuration.TryGetConfig<string>("GlobalConfigPath"))
+    .AddAllAssembliesByAssemblyPrefix(builder.Configuration.TryGetConfig<string>("AssemblyPrefix"))
     .InstallServices(AssemblyCache.Instance.GetAddedAssemblies());
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+#endregion
 
 var app = builder.Build();
+
+#region StartupService
+
+app
+    .DoCreateIndexes(app.Configuration.GetConfig<bool>("EnableIndexCreation"))
+    .DoMigration(app.Configuration.TryGetConfig<MigrationConfig>("MigrationConfig"))
+    .StartInitialServices();
+
+#endregion
+
+#region Middleware
 
 if (app.Environment.IsDevelopment())
 {
@@ -27,5 +37,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+#endregion
 
 app.Run();

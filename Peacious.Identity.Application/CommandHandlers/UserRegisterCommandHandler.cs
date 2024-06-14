@@ -16,7 +16,7 @@ public class UserRegisterCommandHandler(IUserRepository userRepository) : IComma
 
         if (isEmailExist)
         {
-            return Result.Error($"Address : {request.Email} already exist!");
+            return Result.Error($"Email Address : {request.Email} already exist!");
         }
 
        var user = User.Create(

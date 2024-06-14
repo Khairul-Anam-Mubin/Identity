@@ -8,6 +8,8 @@ public class ChangeNameCommandHandler : ICommandHandler<ChangeNameCommand>
 {
     public async Task<IResult> Handle(ChangeNameCommand request, CancellationToken cancellationToken)
     {
+
+
         return Result.Success("Name Changed");
     }
 }

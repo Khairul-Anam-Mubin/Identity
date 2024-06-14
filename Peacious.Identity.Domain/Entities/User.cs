@@ -1,6 +1,7 @@
 ﻿using Peacious.Framework.DDD;
 using Peacious.Framework.ORM.Interfaces;
 using Peacious.Framework.Results;
+using Peacious.Identity.Domain.DomainEvents;
 using Peacious.Identity.Domain.ValueObjects;
 
 namespace Peacious.Identity.Domain.Entities;
@@ -32,6 +33,8 @@ public class User : Entity, IRepositoryItem
         var password = Password.Create(plainPassword);
         var userName = emailAddress;
         var user = new User(name, email, password, userName);
+
+        user.RaiseDomainEvent(new UserCreatedDomainEvent(user.Id, user.UserName));
 
         return user;
     }

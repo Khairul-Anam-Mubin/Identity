@@ -16,7 +16,7 @@ public class AuthController(
 
     [HttpPost]
     [Route("OAuth2/Authorize")]
-    public async Task<IActionResult> AuthorizeAsync(AuthorizationRequest request)
+    public async Task<IActionResult> AuthorizeAsync([FromBody]AuthorizationRequest request)
     {
         var command = new AuthorizationCommand(
             request.ResponseType,
