@@ -1,5 +1,5 @@
 ﻿using Peacious.Framework.DDD;
-using Peacious.Identity.Domain.DomainEvents;
+using Peacious.Identity.Domain.Events;
 
 namespace Peacious.Identity.Application.DomainEventHandlers;
 

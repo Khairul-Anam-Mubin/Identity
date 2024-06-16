@@ -2,6 +2,7 @@
 using Peacious.Framework.ORM.Interfaces;
 using Peacious.Framework.Security;
 using Peacious.Identity.Domain.ValueObjects;
+using System.Security.Claims;
 
 namespace Peacious.Identity.Domain.Entities;
 
@@ -42,5 +43,13 @@ public class Client : Entity, IRepositoryItem
     public void Revoke()
     {
         IsActive = false;
+    }
+
+    public List<Claim> ToClaims()
+    {
+        return new List<Claim>
+        {
+            new Claim("client_id", Id)
+        };
     }
 }

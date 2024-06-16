@@ -2,12 +2,13 @@
 using Peacious.Identity.Application.Commands;
 using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Contracts.DTOs;
+using Peacious.Identity.Contracts.Models;
 
 namespace Peacious.Identity.Application.Extensions;
 
 public static class TokenRequestExtension
 {
-    public static ICommand? ToCreateTokenByGrantTypeCommand(this TokenRequest request)
+    public static ICommand<TokenResponse>? ToCreateTokenByGrantTypeCommand(this TokenRequest request)
     {
         return request.GrantType switch
         {

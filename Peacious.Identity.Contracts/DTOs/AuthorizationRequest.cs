@@ -11,7 +11,7 @@ public record AuthorizationRequest
     public required string ClientId { get; set; }
 
     [JsonPropertyName("redirect_uri")]
-    public string? RedirectUri { get; set; }
+    public required string RedirectUri { get; set; }
 
     public string? Scope { get; set; }
     public string? State { get; set; }

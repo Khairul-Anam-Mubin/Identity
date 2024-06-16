@@ -2,7 +2,7 @@
 
 namespace Peacious.Identity.Contracts.Models;
 
-public class Token
+public class TokenResponse
 {
     [JsonPropertyName("token_type")]
     public string TokenType { get; private set; }
@@ -19,7 +19,7 @@ public class Token
     [JsonPropertyName("scope")]
     public string? Scope { get; private set; }
 
-    private Token(string tokenType, string accessToken, long expiresIn, string? refreshToken, string? scope)
+    private TokenResponse(string tokenType, string accessToken, long expiresIn, string? refreshToken, string? scope)
     {
         TokenType = tokenType;
         AccessToken = accessToken;
@@ -28,8 +28,8 @@ public class Token
         Scope = scope;
     }
 
-    public static Token Create(string tokenType, string accessToken, long expiresIn, string? refreshToken, string? scope)
+    public static TokenResponse Create(string tokenType, string accessToken, long expiresIn, string? refreshToken, string? scope)
     {
-        return new Token(tokenType, accessToken, expiresIn, refreshToken, scope);
+        return new TokenResponse(tokenType, accessToken, expiresIn, refreshToken, scope);
     }
 }

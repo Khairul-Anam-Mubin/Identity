@@ -2,10 +2,9 @@
 
 namespace Peacious.Identity.Application.Commands;
 
-public record AuthorizationCommand(
-    string ResponseType,
+public record AuthorizationTokenResponseTypeCommand(
     string ClientId,
-    string? RedirectUri,
+    string RedirectUri,
     string? Scope,
     string? State,
     string? CodeChallange,
