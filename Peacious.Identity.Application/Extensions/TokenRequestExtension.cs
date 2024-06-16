@@ -1,9 +1,7 @@
 ﻿using Peacious.Framework.CQRS;
-using Peacious.Framework.Results;
 using Peacious.Identity.Application.Commands;
 using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Contracts.DTOs;
-using Peacious.Identity.Contracts.Models;
 
 namespace Peacious.Identity.Application.Extensions;
 

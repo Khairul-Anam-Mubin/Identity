@@ -3,6 +3,7 @@ using Peacious.Framework.CQRS;
 using Peacious.Identity.Application.Commands;
 using Peacious.Identity.Application.Extensions;
 using Peacious.Identity.Contracts.DTOs;
+using Peacious.Identity.Contracts.Models;
 
 namespace Peacious.Identity.Api.Controllers;
 
@@ -46,6 +47,6 @@ public class AuthController(
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return Ok(result);
+        return Ok(result.GetData<Token>("TokenResponse"));
     }
 }

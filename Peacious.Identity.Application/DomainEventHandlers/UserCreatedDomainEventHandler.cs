@@ -1,20 +1,13 @@
-﻿using MediatR;
-using Peacious.Framework.DDD;
-using Peacious.Framework.EDD;
+﻿using Peacious.Framework.DDD;
 using Peacious.Identity.Domain.DomainEvents;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Peacious.Identity.Application.DomainEventHandlers;
 
-public class UserCreatedDomainEventHandler : INotificationHandler<UserCreatedDomainEvent>
+public class UserCreatedDomainEventHandler : IDomainEventHandler<UserCreatedDomainEvent>
 {
-    public async Task Handle(UserCreatedDomainEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(UserCreatedDomainEvent @event, CancellationToken cancellationToken)
     {
-        Console.WriteLine($"UserName: {notification.Id} Event Executing... ");
+        Console.WriteLine($"UserName: {@event.Id} Event Executing... ");
         // todo : send email
     }
 }

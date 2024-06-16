@@ -3,4 +3,7 @@ using Peacious.Identity.Domain.Entities;
 
 namespace Peacious.Identity.Domain.Repositories;
 
-public interface IClientRepository : IRepository<Client> {}
+public interface IPermissionRepository : IRepository<Permission>
+{
+    Task<List<Permission>> GetUserPermissionsAsync(string userId);
+}

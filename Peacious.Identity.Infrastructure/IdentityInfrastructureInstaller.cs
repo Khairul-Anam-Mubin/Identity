@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Peacious.Framework;
-using Peacious.Framework.DDD;
+using Peacious.Framework.Extensions;
+using Peacious.Framework.Identity;
 using Peacious.Framework.ORM;
 using Peacious.Framework.ORM.Migrations;
 using Peacious.Framework.ServiceInstaller;
@@ -21,6 +21,10 @@ public class IdentityInfrastructureInstaller : IServiceInstaller
         services.AddMongoDb();
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IClientRepository, ClientRepository>();
+        services.AddTransient<IPermissionRepository, PermissionRepository>();
+        services.AddTransient<IRoleRepository, RoleRepository>();
+        services.AddTransient<ITokenSessionRepository, TokenSessionRepository>();
         services.AddKeyedTransient<IMigrationJob, ClientMigrationJob>("ClientMigrationJob");
+        services.AddSingleton(configuration.TryGetConfig<TokenConfig>("TokenConfig"));
     }
 }
