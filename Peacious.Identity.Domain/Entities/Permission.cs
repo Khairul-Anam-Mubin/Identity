@@ -10,7 +10,7 @@ public class Permission : Entity, IRepositoryItem
     public bool IsCustom { get; private set; }
 
     private Permission(string title, bool isCustom) 
-        : base(Guid.NewGuid().ToString())
+        : base(GenerateId(title, isCustom))
     {
         Title = title;
         IsCustom = isCustom;
@@ -24,5 +24,12 @@ public class Permission : Entity, IRepositoryItem
     public Claim ToClaim()
     {
         return new Claim("scope", Title);
+    }
+
+    public static string GenerateId(string title, bool isCustom)
+    {
+        if (isCustom) return title;
+
+        return Guid.NewGuid().ToString();
     }
 }

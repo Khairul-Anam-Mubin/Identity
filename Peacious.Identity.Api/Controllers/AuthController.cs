@@ -38,10 +38,15 @@ public class AuthController(
         
         if (command is null)
         {
-            return BadRequest($"Grant Type : {request.GrantType} Not Supported.");
+            return BadRequest($"{request.GrantType} : Grant Type Not Supported.");
         }
 
         var result = await _commandExecutor.ExecuteAsync(command);
+
+        if (result.IsFailure())
+        {
+            return BadRequest(result);
+        }
 
         return Ok(result.Value);
     }

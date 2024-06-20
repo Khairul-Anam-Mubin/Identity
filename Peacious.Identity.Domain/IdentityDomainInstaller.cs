@@ -9,6 +9,6 @@ public class IdentityDomainInstaller : IServiceInstaller
 {
     public void Install(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddTransient<IAccessService, AccessService>();
+        services.AddTransient<ITokenService, TokenService>();
     }
 }

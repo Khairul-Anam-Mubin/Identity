@@ -1,5 +1,6 @@
 ﻿using Peacious.Framework.DDD;
 using Peacious.Framework.ORM.Interfaces;
+using Peacious.Framework.Results;
 using System.Text;
 
 namespace Peacious.Identity.Domain.Entities;
@@ -11,6 +12,7 @@ public class TokenSession : Entity, IRepositoryItem
     public string Role { get; private set; }
     public DateTime ExpireAt { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public DateTime RefreshedAt { get; private set; }
     public bool IsRefreshed { get; private set; }
     public string UserId { get; private set; }
 
@@ -62,5 +64,28 @@ public class TokenSession : Entity, IRepositoryItem
         var role = roleBuilder.ToString();
 
         return new TokenSession(userId, clientId, scope, role, expireAt);
+    }
+
+    public IResult Refresh()
+    {
+        if (IsExpired())
+        {
+            return Result.Error("Refresh token already expired.");
+        }
+
+        if (IsRefreshed)
+        {
+            return Result.Error("Already refreshed with this token.");
+        }
+
+        IsRefreshed = true;
+        RefreshedAt = DateTime.UtcNow;
+
+        return Result.Success();
+    }
+
+    public bool IsExpired()
+    {
+        return ExpireAt < DateTime.UtcNow;
     }
 }

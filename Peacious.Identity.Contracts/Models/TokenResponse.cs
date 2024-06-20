@@ -19,17 +19,12 @@ public class TokenResponse
     [JsonPropertyName("scope")]
     public string? Scope { get; private set; }
 
-    private TokenResponse(string tokenType, string accessToken, long expiresIn, string? refreshToken, string? scope)
+    public TokenResponse(string tokenType, string accessToken, long expiresIn, string? refreshToken, string? scope)
     {
         TokenType = tokenType;
         AccessToken = accessToken;
         RefreshToken = refreshToken;
         ExpiresIn = expiresIn;
         Scope = scope;
-    }
-
-    public static TokenResponse Create(string tokenType, string accessToken, long expiresIn, string? refreshToken, string? scope)
-    {
-        return new TokenResponse(tokenType, accessToken, expiresIn, refreshToken, scope);
     }
 }

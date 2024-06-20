@@ -17,4 +17,9 @@ public class Role : Entity, IRepositoryItem
     {
         return new Claim("role", Name);
     }
+
+    public static Role Create(string name)
+    {
+        return new Role(name);
+    }
 }

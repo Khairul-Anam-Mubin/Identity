@@ -11,11 +11,11 @@ namespace Peacious.Identity.Application.CommandHandlers;
 public class CreateTokenForPasswordGrantTypeCommandHandler(
     IClientRepository clientRepository,
     IUserRepository userRepository,
-    IAccessService accessService) : ICommandHandler<CreateTokenForPasswordGrantTypeCommand, TokenResponse>
+    ITokenService tokenService) : ICommandHandler<CreateTokenForPasswordGrantTypeCommand, TokenResponse>
 {
     private readonly IClientRepository _clientRepository = clientRepository;
     private readonly IUserRepository _userRepository = userRepository;
-    private readonly IAccessService _accessService = accessService;
+    private readonly ITokenService _tokenService = tokenService;
     
     public async Task<IResult<TokenResponse>> Handle(
         CreateTokenForPasswordGrantTypeCommand command, 
@@ -40,25 +40,25 @@ public class CreateTokenForPasswordGrantTypeCommandHandler(
             return Result.Error<TokenResponse>("Password Error.");
         }
 
-        var accessTokenResult = await _accessService.CreateUserAccessTokenAsync(user.Id, client.Id);
+        var refreshTokenCreateResult = await _tokenService.CreateUserRefreshTokenAsync(user, client);
 
-        if (accessTokenResult.IsFailure() || accessTokenResult.Value is null)
+        if (refreshTokenCreateResult.IsFailure() || refreshTokenCreateResult.Value is null)
         {
-            return Result.Error<TokenResponse>(accessTokenResult.Message);
+            return Result.Error<TokenResponse>(refreshTokenCreateResult.Message);
         }
 
-        var refreshTokenResult = await _accessService.CreateUserAccessTokenAsync(user.Id, client.Id);
+        var accessTokenCreateResult = await _tokenService.CreateUserAccessTokenAsync(user, client);
 
-        if (refreshTokenResult.IsFailure() || refreshTokenResult.Value is null)
+        if (accessTokenCreateResult.IsFailure() || accessTokenCreateResult.Value is null)
         {
-            return Result.Error<TokenResponse>(refreshTokenResult.Message);
+            return Result.Error<TokenResponse>(accessTokenCreateResult.Message);
         }
 
-        var tokenResponse = TokenResponse.Create(
+        var tokenResponse = new TokenResponse(
             TokenType.Bearer,
-            accessTokenResult.Value, 
-            _accessService.AccessTokenExpirationTimeInSecond(), 
-            refreshTokenResult.Value, 
+            accessTokenCreateResult.Value, 
+            _tokenService.AccessTokenExpirationTimeInSecond(), 
+            refreshTokenCreateResult.Value, 
             null);
 
         return Result.Success(tokenResponse);
