@@ -1,6 +1,5 @@
 ﻿using Peacious.Framework.DDD;
 using Peacious.Framework.ORM.Interfaces;
-using System.Security.Claims;
 
 namespace Peacious.Identity.Domain.Entities;
 
@@ -19,11 +18,6 @@ public class Permission : Entity, IRepositoryItem
     public static Permission Create(string title, bool isCustom)
     {
         return new Permission(title, isCustom);
-    }
-
-    public Claim ToClaim()
-    {
-        return new Claim("scope", Title);
     }
 
     public static string GenerateId(string title, bool isCustom)

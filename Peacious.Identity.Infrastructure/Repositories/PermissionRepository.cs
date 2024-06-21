@@ -17,6 +17,19 @@ public class PermissionRepository : RepositoryBaseWrapper<Permission>, IPermissi
         : base(configuration.TryGetConfig<DatabaseInfo>("MongoDbConfig"), dbContextFactory.GetDbContext(Context.Mongo), eventExecutor)
     { }
 
+    public async Task<List<Permission>> GetClientPermissionsAsync(string clientId)
+    {
+        var filterBuilder = new FilterBuilder<ClientPermission>();
+
+        var clientIdFilter = filterBuilder.Eq(permission => permission.ClientId, clientId);
+
+        var clientPermissions = await DbContext.GetManyAsync<UserPermission>(DatabaseInfo, clientIdFilter);
+
+        var clientPermissionIds = clientPermissions.Select(permission => permission.Id).ToList();
+
+        return await GetManyByIdsAsync(clientPermissionIds);
+    }
+
     public async Task<List<Permission>> GetUserPermissionsAsync(string userId)
     {
         var filterBuilder = new FilterBuilder<UserPermission>();

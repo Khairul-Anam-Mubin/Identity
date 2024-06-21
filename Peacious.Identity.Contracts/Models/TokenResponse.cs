@@ -11,12 +11,14 @@ public class TokenResponse
     public string AccessToken { get; private set; }
 
     [JsonPropertyName("refresh_token")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? RefreshToken { get; private set; }
 
     [JsonPropertyName("expires_in")]
     public long ExpiresIn { get; private set; }
 
     [JsonPropertyName("scope")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Scope { get; private set; }
 
     public TokenResponse(string tokenType, string accessToken, long expiresIn, string? refreshToken, string? scope)

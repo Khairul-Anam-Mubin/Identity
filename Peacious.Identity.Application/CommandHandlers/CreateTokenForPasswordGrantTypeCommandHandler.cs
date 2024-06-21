@@ -1,10 +1,11 @@
 ﻿using Peacious.Framework.CQRS;
 using Peacious.Framework.Results;
 using Peacious.Identity.Application.Commands;
+using Peacious.Identity.Application.Services;
 using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Contracts.Models;
+using Peacious.Identity.Domain.Errors;
 using Peacious.Identity.Domain.Repositories;
-using Peacious.Identity.Domain.Services;
 
 namespace Peacious.Identity.Application.CommandHandlers;
 
@@ -25,33 +26,33 @@ public class CreateTokenForPasswordGrantTypeCommandHandler(
 
         if (client is null)
         {
-            return Result.Error<TokenResponse>("Invalid Client Id");
+            return OAuthError.InvalidClient.InResult<TokenResponse>();
         }
 
         var user = await _userRepository.GetUserByUserNameAsync(command.UserName);
 
         if (user is null)
         {
-            return Result.Error<TokenResponse>("User not found.");
+            return Result.Failure<TokenResponse>(OAuthError.NoAccess);
         }
 
         if (!user.Password.IsMatch(command.Password))
         {
-            return Result.Error<TokenResponse>("Password Error.");
+            return Result.Failure<TokenResponse>(OAuthError.NoAccess);
         }
 
         var refreshTokenCreateResult = await _tokenService.CreateUserRefreshTokenAsync(user, client);
 
-        if (refreshTokenCreateResult.IsFailure() || refreshTokenCreateResult.Value is null)
+        if (refreshTokenCreateResult.IsFailure || refreshTokenCreateResult.Value is null)
         {
-            return Result.Error<TokenResponse>(refreshTokenCreateResult.Message);
+            return Result.Create<TokenResponse>(refreshTokenCreateResult);
         }
 
         var accessTokenCreateResult = await _tokenService.CreateUserAccessTokenAsync(user, client);
 
-        if (accessTokenCreateResult.IsFailure() || accessTokenCreateResult.Value is null)
+        if (accessTokenCreateResult.IsFailure || accessTokenCreateResult.Value is null)
         {
-            return Result.Error<TokenResponse>(accessTokenCreateResult.Message);
+            return Result.Create<TokenResponse>(accessTokenCreateResult);
         }
 
         var tokenResponse = new TokenResponse(

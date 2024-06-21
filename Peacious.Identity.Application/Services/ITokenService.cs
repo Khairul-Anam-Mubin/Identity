@@ -2,7 +2,7 @@
 using Peacious.Identity.Domain.Entities;
 using System.Security.Claims;
 
-namespace Peacious.Identity.Domain.Services;
+namespace Peacious.Identity.Application.Services;
 
 public interface ITokenService
 {
@@ -15,6 +15,8 @@ public interface ITokenService
     public int AccessTokenExpirationTimeInSecond();
 
     public int RefreshTokenExpirationTimeInSecond();
+
+    Task<string> CreateClientAccessTokenAsync(User user, Client client);
 
     string CreateUserAccessToken(
         User user, Client client, List<Role> roles, List<Permission> permissions);

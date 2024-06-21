@@ -70,12 +70,12 @@ public class TokenSession : Entity, IRepositoryItem
     {
         if (IsExpired())
         {
-            return Result.Error("Refresh token already expired.");
+            return Error.Validation("Refresh token already expired.").InResult();
         }
 
         if (IsRefreshed)
         {
-            return Result.Error("Already refreshed with this token.");
+            return Error.Validation("Already refreshed with this token.").InResult();
         }
 
         IsRefreshed = true;

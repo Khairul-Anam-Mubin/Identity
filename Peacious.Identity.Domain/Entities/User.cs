@@ -3,7 +3,6 @@ using Peacious.Framework.ORM.Interfaces;
 using Peacious.Framework.Results;
 using Peacious.Identity.Domain.Events;
 using Peacious.Identity.Domain.ValueObjects;
-using System.Security.Claims;
 
 namespace Peacious.Identity.Domain.Entities;
 
@@ -56,7 +55,7 @@ public class User : Entity, IRepositoryItem
     {
         if (!Password.IsMatch(oldPassword))
         {
-            return Result.Error("Old password not matched");
+            return Error.Validation("Old password not matched").InResult();
         }
 
         Password = Password.Create(newPassword);
@@ -76,16 +75,5 @@ public class User : Entity, IRepositoryItem
         UserName = userName;
 
         return Result.Success();
-    }
-
-    public List<Claim> ToClaims()
-    {
-        return new List<Claim>
-        {
-            new Claim("sub", Id),
-            new Claim("username", UserName),
-            new Claim("first_name", Name.FirstName),
-            new Claim("last_name", Name.LastName),
-        };
     }
 }

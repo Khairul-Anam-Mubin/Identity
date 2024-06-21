@@ -2,10 +2,11 @@
 using Peacious.Framework.Identity;
 using Peacious.Framework.Results;
 using Peacious.Identity.Application.Commands;
+using Peacious.Identity.Application.Services;
 using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Contracts.Models;
+using Peacious.Identity.Domain.Errors;
 using Peacious.Identity.Domain.Repositories;
-using Peacious.Identity.Domain.Services;
 
 namespace Peacious.Identity.Application.CommandHandlers;
 
@@ -23,50 +24,50 @@ public class CreateTokenForRefreshTokenGrantTypeCommandHandler(
     {
         var tokenValidationResult = _tokenService.ValidateToken(command.RefreshToken);
 
-        if (tokenValidationResult.IsFailure())
+        if (tokenValidationResult.IsFailure)
         {
-            return Result.Error<TokenResponse>(tokenValidationResult.Message);
+            return OAuthError.UnauthorizedClient.InResult<TokenResponse>();
         }
-
+        
         var claims = TokenHelper.GetClaims(command.RefreshToken);
 
-        var tokenSessionId = claims.FirstOrDefault(claim => claim.Type == "jti")?.Value;
+        var tokenSessionId = claims.FirstOrDefault(claim => claim.Type == ClaimType.JwtTokenId)?.Value;
 
         if (string.IsNullOrEmpty(tokenSessionId))
         {
-            return Result.Error<TokenResponse>("jti not found after parsing the token");
+            return Result.Failure<TokenResponse>(Error.Validation("Jwti Token not found"));
         }
 
-        var clientId = claims.FirstOrDefault(claim => claim.Type == "client_id")?.Value;
+        var clientId = claims.FirstOrDefault(claim => claim.Type == ClaimType.ClientId)?.Value;
 
         if (string.IsNullOrEmpty(clientId))
         {
-            return Result.Error<TokenResponse>("client_id not found after parsing the token");
+            return Result.Failure<TokenResponse>(Error.Validation($"{ClaimType.ClientId} not found after parsing the token"));
         }
 
         if (!clientId.Equals(command.ClientId))
         {
-            return Result.Error<TokenResponse>(
-                "Token refresh is not permissible from another client. Provide the exact valid client_id");
+            return Result.Failure<TokenResponse>(Error.Validation(
+                $"Token refresh is not permissible from another client. Provide the exact valid client_id"));
         }
 
         var client = await _clientRepository.GetByIdAsync(clientId);
 
         if (client is null)
         {
-            return Result.Error<TokenResponse>("Invalid Client Id");
+            return Result.Failure<TokenResponse>(OAuthError.InvalidClient);
         }
 
         var tokenSession = await _tokenSessionRepository.GetByIdAsync(tokenSessionId);
 
         if (tokenSession is null)
         {
-            return Result.Error<TokenResponse>("TokenSession not found");
+            return Result.Failure<TokenResponse>(Error.Validation("TokenSession not found"));
         }
 
         var tokenSessionRefreshResult = tokenSession.Refresh();
 
-        if (tokenSessionRefreshResult.IsFailure())
+        if (tokenSessionRefreshResult.IsFailure)
         {
             return Result.Create<TokenResponse>(tokenSessionRefreshResult);
         }

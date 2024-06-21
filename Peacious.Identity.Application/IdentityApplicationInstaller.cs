@@ -5,6 +5,7 @@ using Peacious.Framework.CQRS;
 using Peacious.Framework.DDD;
 using Peacious.Framework.Mediators;
 using Peacious.Framework.ServiceInstaller;
+using Peacious.Identity.Application.Services;
 
 namespace Peacious.Identity.Application;
 
@@ -15,5 +16,6 @@ public class IdentityApplicationInstaller : IServiceInstaller
         services.AddMediator(AssemblyCache.Instance.GetAddedAssemblies());
         services.AddCQRS();
         services.AddDDD();
+        services.AddTransient<ITokenService, TokenService>();
     }
 }

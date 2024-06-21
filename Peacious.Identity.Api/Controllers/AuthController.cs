@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Peacious.Framework.CQRS;
+using Peacious.Framework.Results;
 using Peacious.Identity.Application.Extensions;
 using Peacious.Identity.Contracts.DTOs;
 
@@ -43,11 +44,12 @@ public class AuthController(
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        if (result.IsFailure())
-        {
-            return BadRequest(result);
-        }
+        //if (result.IsFailure)
+        //{
+        //    return BadRequest(result.Error.ToOAuth2ErrorResponse());
+        //}
 
-        return Ok(result.Value);
+        return result.ToObjectResult(ErrorResponseType.OAuth2Error);
+        //return Ok(result.Value);
     }
 }

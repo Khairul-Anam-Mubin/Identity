@@ -1,12 +1,14 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Peacious.Framework.Identity;
 using Peacious.Framework.Results;
+using Peacious.Identity.Application.Extensions;
+using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Domain.Entities;
 using Peacious.Identity.Domain.Repositories;
 using System.Security.Claims;
 using System.Text;
 
-namespace Peacious.Identity.Domain.Services;
+namespace Peacious.Identity.Application.Services;
 
 public class TokenService(
     TokenConfig tokenConfig,
@@ -23,7 +25,7 @@ public class TokenService(
     private readonly IRoleRepository _roleRepository = roleRepository;
     private readonly ITokenSessionRepository _tokenSessionRepository = tokenSessionRepository;
 
-    public IResult ValidateToken(string jwtToken, 
+    public IResult ValidateToken(string jwtToken,
         bool validateIssuer = true,
         bool validateAudience = true,
         bool validateLifetime = true,
@@ -35,12 +37,33 @@ public class TokenService(
             validateLifetime,
             validateIssuerSigningKey);
 
-        if (TokenHelper.TryValidateToken(jwtToken, validationParameter , out string validationMessage))
+        if (TokenHelper.TryValidateToken(jwtToken, validationParameter, out string validationMessage))
         {
             return Result.Success(validationMessage);
         }
 
-        return Result.Error(validationMessage);
+        return Result.Failure(Error.Validation(validationMessage));
+    }
+
+    public async Task<string> CreateClientAccessTokenAsync(User user, Client client)
+    {
+        var permissions = await _permissionRepository.GetClientPermissionsAsync(client.Id);
+
+        var userClaims = user.ToClaims();
+        var clientClaims = client.ToClaims();
+        var scopeClaims =
+            permissions.Select(permission => permission.ToClaim());
+
+        var allClaims = new List<Claim>
+        {
+            new Claim(ClaimType.JwtTokenId, Guid.NewGuid().ToString())
+        };
+
+        allClaims.AddRange(userClaims);
+        allClaims.AddRange(clientClaims);
+        allClaims.AddRange(scopeClaims);
+
+        return GenerateAccessToken(allClaims);
     }
 
     public string GenerateAccessToken(List<Claim> claims)
@@ -59,15 +82,15 @@ public class TokenService(
     {
         var claims = GetDeterminedClaims(refreshTokenClaims);
 
-        claims.Add(new Claim("jti", Guid.NewGuid().ToString()));
+        claims.Add(new Claim(ClaimType.JwtTokenId, Guid.NewGuid().ToString()));
 
         var roles = refreshTokenSession.Role.Split(' ').ToList();
 
-        roles.ForEach(role => claims.Add(new Claim("role", role)));
+        roles.ForEach(role => claims.Add(new Claim(ClaimType.Role, role)));
 
         var scopes = refreshTokenSession.Scope.Split(' ').ToList();
 
-        scopes.ForEach(scope => claims.Add(new Claim("scope", scope)));
+        scopes.ForEach(scope => claims.Add(new Claim(ClaimType.Scope, scope)));
 
         return GenerateAccessToken(claims);
     }
@@ -76,7 +99,7 @@ public class TokenService(
     {
         var userClaims = ConvertToClaims(user, client, roles, permissions);
 
-        userClaims.Add(new Claim("jti", Guid.NewGuid().ToString()));
+        userClaims.Add(new Claim(ClaimType.JwtTokenId, Guid.NewGuid().ToString()));
 
         return GenerateAccessToken(userClaims);
     }
@@ -95,12 +118,12 @@ public class TokenService(
     {
         var user = await _userRepository.GetByIdAsync(userId);
 
-        if (user is null) return Result.Error<string>("User not found while creating access token.");
-        
+        if (user is null) return Result.Failure<string>(Error.NotFound("User not found while creating access token."));
+
         var client = await _clientRepository.GetByIdAsync(clientId);
 
-        if (client is null) return Result.Error<string>("Client not found while creating access token.");
-        
+        if (client is null) return Result.Failure<string>(Error.NotFound("Client not found while creating access token."));
+
         var accessTokenCreateResult = await CreateUserAccessTokenAsync(user, client);
 
         return accessTokenCreateResult;
@@ -132,7 +155,7 @@ public class TokenService(
 
         var claims = GetDeterminedClaims(refreshTokenClaims);
 
-        claims.Add(new Claim("jti", newTokenSession.Id));
+        claims.Add(new Claim(ClaimType.JwtTokenId, newTokenSession.Id));
 
         return GenerateRefreshToken(claims);
     }
@@ -154,7 +177,7 @@ public class TokenService(
 
         var refreshTokenClaims = new List<Claim>
         {
-            new Claim("jti", tokenSession.Id)
+            new Claim(ClaimType.JwtTokenId, tokenSession.Id)
         };
 
         refreshTokenClaims.AddRange(userClaims);
@@ -177,11 +200,11 @@ public class TokenService(
     {
         var user = await _userRepository.GetByIdAsync(userId);
 
-        if (user is null) return Result.Error<string>("User not found while creating refresh token.");
+        if (user is null) return Result.Failure<string>(Error.NotFound("User not found while creating refresh token."));
 
         var client = await _clientRepository.GetByIdAsync(clientId);
 
-        if (client is null) return Result.Error<string>("Client not found while creating refresh token.");
+        if (client is null) return Result.Failure<string>(Error.NotFound("Client not found while creating refresh token."));
 
         var refreshTokenCreateResult = await CreateUserRefreshTokenAsync(user, client);
 
@@ -194,10 +217,10 @@ public class TokenService(
     private List<Claim> GetDeterminedClaims(List<Claim> claims)
     {
         return claims.Where(x =>
-               x.Type != "jti" &&
-               x.Type != "aud" &&
-               x.Type != "iss" &&
-               x.Type != "exp")
+               x.Type != ClaimType.JwtTokenId &&
+               x.Type != ClaimType.Audience &&
+               x.Type != ClaimType.Issuer &&
+               x.Type != ClaimType.ExpirationTime)
            .ToList();
     }
 
