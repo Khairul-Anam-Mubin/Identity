@@ -55,7 +55,7 @@ public class User : Entity, IRepositoryItem
     {
         if (!Password.IsMatch(oldPassword))
         {
-            return Error.Validation("Old password not matched").InResult();
+            return Error.Validation("Old password not matched").Result();
         }
 
         Password = Password.Create(newPassword);

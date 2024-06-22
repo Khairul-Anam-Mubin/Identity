@@ -3,32 +3,30 @@ using Peacious.Framework.CQRS;
 using Peacious.Framework.Results;
 using Peacious.Identity.Application.Extensions;
 using Peacious.Identity.Contracts.DTOs;
+using Peacious.Identity.Domain.Errors;
 
 namespace Peacious.Identity.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController(
-    ICommandExecutor commandExecutor,
-    IQueryExecutor queryExecutor) : ControllerBase
+public class AuthController(ICommandExecutor commandExecutor) : ControllerBase
 {
     private readonly ICommandExecutor _commandExecutor = commandExecutor;
-    private readonly IQueryExecutor _queryExecutor = queryExecutor;
 
     [HttpPost]
     [Route("OAuth2/Authorize")]
-    public async Task<IActionResult> AuthorizeAsync([FromBody]AuthorizationRequest request)
+    public async Task<IActionResult> AuthorizeAsync(AuthorizationRequest request)
     {
         var command = request.ToAuthorizationResponseTypeCommand();
 
         if (command is null)
         {
-            return BadRequest($"Response Type : {request.ResponseType} Not Supported.");
+            return OAuthError.InvalidResponseType.Result().ToObjectResult(ErrorResponseType.OAuth2Error);
         }
 
         var result = await _commandExecutor.ExecuteAsync(command);
-
-        return Ok(result);
+        
+        return result.ToObjectResult(ErrorResponseType.OAuth2Error);
     }
 
     [HttpPost]
@@ -39,17 +37,11 @@ public class AuthController(
         
         if (command is null)
         {
-            return BadRequest($"{request.GrantType} : Grant Type Not Supported.");
+            return OAuthError.InvalidGrant.Result().ToObjectResult(ErrorResponseType.OAuth2Error);
         }
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        //if (result.IsFailure)
-        //{
-        //    return BadRequest(result.Error.ToOAuth2ErrorResponse());
-        //}
-
         return result.ToObjectResult(ErrorResponseType.OAuth2Error);
-        //return Ok(result.Value);
     }
 }

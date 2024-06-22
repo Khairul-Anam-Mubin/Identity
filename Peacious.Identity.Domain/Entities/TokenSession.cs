@@ -1,6 +1,7 @@
 ﻿using Peacious.Framework.DDD;
 using Peacious.Framework.ORM.Interfaces;
 using Peacious.Framework.Results;
+using Peacious.Identity.Domain.Errors;
 using System.Text;
 
 namespace Peacious.Identity.Domain.Entities;
@@ -70,12 +71,12 @@ public class TokenSession : Entity, IRepositoryItem
     {
         if (IsExpired())
         {
-            return Error.Validation("Refresh token already expired.").InResult();
+            return OAuthError.InvalidToken("Refresh token already expired.").Result();
         }
 
         if (IsRefreshed)
         {
-            return Error.Validation("Already refreshed with this token.").InResult();
+            return OAuthError.InvalidToken("Already refreshed with this token.").Result();
         }
 
         IsRefreshed = true;

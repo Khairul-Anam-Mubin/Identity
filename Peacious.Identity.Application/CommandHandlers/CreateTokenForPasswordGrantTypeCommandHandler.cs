@@ -26,33 +26,33 @@ public class CreateTokenForPasswordGrantTypeCommandHandler(
 
         if (client is null)
         {
-            return OAuthError.InvalidClient.InResult<TokenResponse>();
+            return OAuthError.InvalidClient(command.ClientId).Result<TokenResponse>();
         }
 
         var user = await _userRepository.GetUserByUserNameAsync(command.UserName);
 
         if (user is null)
         {
-            return Result.Failure<TokenResponse>(OAuthError.NoAccess);
+            return OAuthError.InvalidUser(command.UserName).Result<TokenResponse>();
         }
 
         if (!user.Password.IsMatch(command.Password))
         {
-            return Result.Failure<TokenResponse>(OAuthError.NoAccess);
+            return OAuthError.InvalidCredentials.Result<TokenResponse>();
         }
 
         var refreshTokenCreateResult = await _tokenService.CreateUserRefreshTokenAsync(user, client);
 
         if (refreshTokenCreateResult.IsFailure || refreshTokenCreateResult.Value is null)
         {
-            return Result.Create<TokenResponse>(refreshTokenCreateResult);
+            return OAuthError.ServerError.Result<TokenResponse>();
         }
 
         var accessTokenCreateResult = await _tokenService.CreateUserAccessTokenAsync(user, client);
 
         if (accessTokenCreateResult.IsFailure || accessTokenCreateResult.Value is null)
         {
-            return Result.Create<TokenResponse>(accessTokenCreateResult);
+            return OAuthError.ServerError.Result<TokenResponse>();
         }
 
         var tokenResponse = new TokenResponse(

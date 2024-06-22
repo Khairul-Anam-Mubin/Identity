@@ -26,7 +26,7 @@ public class CreateTokenForRefreshTokenGrantTypeCommandHandler(
 
         if (tokenValidationResult.IsFailure)
         {
-            return OAuthError.UnauthorizedClient.InResult<TokenResponse>();
+            return tokenValidationResult.ToResult<TokenResponse>();
         }
         
         var claims = TokenHelper.GetClaims(command.RefreshToken);
@@ -35,41 +35,40 @@ public class CreateTokenForRefreshTokenGrantTypeCommandHandler(
 
         if (string.IsNullOrEmpty(tokenSessionId))
         {
-            return Result.Failure<TokenResponse>(Error.Validation("Jwti Token not found"));
+            return OAuthError.InvalidToken("jti missing while validating the token.").Result<TokenResponse>();
         }
 
         var clientId = claims.FirstOrDefault(claim => claim.Type == ClaimType.ClientId)?.Value;
 
         if (string.IsNullOrEmpty(clientId))
         {
-            return Result.Failure<TokenResponse>(Error.Validation($"{ClaimType.ClientId} not found after parsing the token"));
+            return OAuthError.InvalidToken("client_id missing while validating the token.").Result<TokenResponse>();
         }
 
         if (!clientId.Equals(command.ClientId))
         {
-            return Result.Failure<TokenResponse>(Error.Validation(
-                $"Token refresh is not permissible from another client. Provide the exact valid client_id"));
+            return OAuthError.InvalidClient(clientId).Result<TokenResponse>();
         }
 
         var client = await _clientRepository.GetByIdAsync(clientId);
 
         if (client is null)
         {
-            return Result.Failure<TokenResponse>(OAuthError.InvalidClient);
+            return OAuthError.InvalidClient(clientId).Result<TokenResponse>();
         }
 
         var tokenSession = await _tokenSessionRepository.GetByIdAsync(tokenSessionId);
 
         if (tokenSession is null)
         {
-            return Result.Failure<TokenResponse>(Error.Validation("TokenSession not found"));
+            return OAuthError.InvalidToken("TokenSession not found").Result<TokenResponse>();
         }
 
         var tokenSessionRefreshResult = tokenSession.Refresh();
 
         if (tokenSessionRefreshResult.IsFailure)
         {
-            return Result.Create<TokenResponse>(tokenSessionRefreshResult);
+            return tokenSessionRefreshResult.ToResult<TokenResponse>();
         }
 
         await _tokenSessionRepository.SaveAsync(tokenSession);

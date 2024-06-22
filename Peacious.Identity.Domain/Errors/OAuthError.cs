@@ -4,10 +4,31 @@ namespace Peacious.Identity.Domain.Errors;
 
 public class OAuthError
 {
-    public static readonly Error InvalidRequest = 
+    public static Error InvalidUser(string userName) => 
+        Error.NotFound(
+            "invalid_user",
+            $"User with username : {userName} not found.");
+
+    public static Error InvalidClient(string clientId) =>
+       Error.NotFound(
+           "invalid_client",
+           $"Client with client_id : {clientId} not found.",
+           "https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/");
+
+    public static Error InvalidCredentials =>
+        Error.Unauthorized(
+            "unauthorized_client",
+            $"Invalid client or user credentials.");
+
+    public static Error InvalidToken(string description) =>
+        Error.Unauthorized(
+            "invalid_token",
+            description);
+
+    public static Error InvalidRequest(string parameter) => 
         Error.Validation(
             "invalid_request", 
-            "an invalid request parameter is given", 
+            $"Invalid {parameter}", 
             "https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/");
 
     public static readonly Error NoAccess =
@@ -16,16 +37,16 @@ public class OAuthError
             "an invalid request parameter is given",
             "https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/");
 
-    public static readonly Error InvalidClient =
-       Error.Validation(
-           "invalid_client",
-           "an invalid request parameter is given",
-           "https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/");
-
     public static readonly Error InvalidGrant =
         Error.Validation(
            "invalid_grant",
-           "an invalid request parameter is given",
+           "Please provide a valid grant type.",
+           "https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/");
+
+    public static readonly Error InvalidResponseType =
+        Error.Validation(
+           "invalid_response_type",
+           "Please provide a valid response type.",
            "https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/");
 
     public static readonly Error InvalidScope =
@@ -43,7 +64,7 @@ public class OAuthError
     public static readonly Error UnsupportedGrantType =
         Error.Validation(
            "unsupported_grant_type",
-           "an invalid request parameter is given",
+           "Grant type not supported. Please try with another grant.",
            "https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/");
 
     public static readonly Error UnsupportedResponseType =
@@ -61,7 +82,7 @@ public class OAuthError
     public static readonly Error ServerError =
         Error.Failure(
            "server_error",
-           "an invalid request parameter is given",
+           "Some exceptions needs to be handled. Please contact for support.",
            "https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/");
 
     public static readonly Error TemporarilyUnavailable =

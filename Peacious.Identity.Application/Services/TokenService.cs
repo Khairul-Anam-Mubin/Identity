@@ -4,6 +4,7 @@ using Peacious.Framework.Results;
 using Peacious.Identity.Application.Extensions;
 using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Domain.Entities;
+using Peacious.Identity.Domain.Errors;
 using Peacious.Identity.Domain.Repositories;
 using System.Security.Claims;
 using System.Text;
@@ -42,7 +43,7 @@ public class TokenService(
             return Result.Success(validationMessage);
         }
 
-        return Result.Failure(Error.Validation(validationMessage));
+        return OAuthError.InvalidToken(validationMessage).Result();
     }
 
     public async Task<string> CreateClientAccessTokenAsync(User user, Client client)

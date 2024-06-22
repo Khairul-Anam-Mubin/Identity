@@ -25,19 +25,19 @@ public class CreateTokenForClientCredentialsGrantTypeCommandHandler(
 
         if (client is null)
         {
-            return Result.Failure<TokenResponse>(OAuthError.InvalidClient);
+            return OAuthError.InvalidClient(command.ClientId).Result<TokenResponse>();
         }
 
         if (!client.Secret.IsMatch(command.ClientSecret))
         {
-            return Result.Failure<TokenResponse>(OAuthError.NoAccess);
+            return OAuthError.InvalidCredentials.Result<TokenResponse>();
         }
         
         var user = await _userRepository.GetUserByUserNameAsync(client.UserName);
 
         if (user is null)
         {
-            return Result.Failure<TokenResponse>(OAuthError.NoAccess);
+            return OAuthError.InvalidUser(client.UserName).Result<TokenResponse>();
         }
 
         var accessToken = await _tokenService.CreateClientAccessTokenAsync(user, client);

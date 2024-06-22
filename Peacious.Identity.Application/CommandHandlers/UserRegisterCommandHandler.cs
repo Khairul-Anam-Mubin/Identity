@@ -16,7 +16,7 @@ public class UserRegisterCommandHandler(IUserRepository userRepository) : IComma
 
         if (isEmailExist)
         {
-            return Result.Failure(Error.Conflict($"Email Address : {request.Email} already exist!"));
+            return Error.Conflict("email_exist", $"Email Address : {request.Email} already exist!").Result();
         }
 
         var user = User.Create(
@@ -30,6 +30,6 @@ public class UserRegisterCommandHandler(IUserRepository userRepository) : IComma
             return Result.Success("Registered Successfully");
         }
 
-        return Error.Failure("Bad happened").InResult();
+        return Error.Failure("save_problem").Result();
     }
 }
