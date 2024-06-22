@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Peacious.Framework.CQRS;
 using Peacious.Framework.Results;
 using Peacious.Identity.Application.Extensions;
@@ -15,6 +16,7 @@ public class AuthController(ICommandExecutor commandExecutor) : ControllerBase
 
     [HttpPost]
     [Route("OAuth2/Authorize")]
+    [Authorize]
     public async Task<IActionResult> AuthorizeAsync(AuthorizationRequest request)
     {
         var command = request.ToAuthorizationResponseTypeCommand();
