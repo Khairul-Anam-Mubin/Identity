@@ -18,6 +18,8 @@ public interface ITokenService
 
     Task<string> CreateClientAccessTokenAsync(User user, Client client);
 
+    string CreateUserAccessToken(User user, Client client, string? scope);
+
     string CreateUserAccessToken(
         User user, Client client, List<Role> roles, List<Permission> permissions);
 

@@ -79,19 +79,46 @@ public class TokenService(
         return token;
     }
 
+    public string CreateUserAccessToken(User user, Client client, string? scope)
+    {
+        var claims = new List<Claim>();
+
+        var userClaims = user.ToClaims();
+        var clientClaims = client.ToClaims();
+
+        claims.AddRange(userClaims);
+        claims.AddRange(clientClaims);
+        claims.Add(new Claim(ClaimType.JwtTokenId, Guid.NewGuid().ToString()));
+
+        if (!string.IsNullOrEmpty(scope))
+        {
+            var scopes = scope?.Split(' ')?.ToList() ?? new List<string>();
+
+            scopes.ForEach(scope => claims.Add(new Claim(ClaimType.Scope, scope)));
+        }
+
+        return GenerateAccessToken(claims);
+    }
+
     public string CreateUserAccessToken(TokenSession refreshTokenSession, List<Claim> refreshTokenClaims)
     {
         var claims = GetDeterminedClaims(refreshTokenClaims);
 
         claims.Add(new Claim(ClaimType.JwtTokenId, Guid.NewGuid().ToString()));
 
-        var roles = refreshTokenSession.Role.Split(' ').ToList();
+        if (!string.IsNullOrEmpty(refreshTokenSession.Role))
+        {
+            var roles = refreshTokenSession.Role.Split(' ').ToList();
 
-        roles.ForEach(role => claims.Add(new Claim(ClaimType.Role, role)));
+            roles.ForEach(role => claims.Add(new Claim(ClaimType.Role, role)));
+        }
 
-        var scopes = refreshTokenSession.Scope.Split(' ').ToList();
+        if (!string.IsNullOrEmpty(refreshTokenSession.Scope))
+        {
+            var scopes = refreshTokenSession.Scope.Split(' ').ToList();
 
-        scopes.ForEach(scope => claims.Add(new Claim(ClaimType.Scope, scope)));
+            scopes.ForEach(scope => claims.Add(new Claim(ClaimType.Scope, scope)));
+        }
 
         return GenerateAccessToken(claims);
     }

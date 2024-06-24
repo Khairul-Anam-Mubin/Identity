@@ -7,7 +7,7 @@ namespace Peacious.Identity.Application.Extensions
 {
     public static class AuthorizationRequestExtension
     {
-        public static ICommand? ToAuthorizationResponseTypeCommand(this AuthorizationRequest request)
+        public static ICommand<AuthorizationResponse>? ToAuthorizationResponseTypeCommand(this AuthorizationRequest request, string userId)
         {
             return request.ResponseType switch
             {
@@ -15,6 +15,7 @@ namespace Peacious.Identity.Application.Extensions
                     new AuthorizationCodeResponseTypeCommand(
                         request.ClientId,
                         request.RedirectUri,
+                        userId,
                         request.Scope,
                         request.State,
                         request.CodeChallange,
@@ -23,6 +24,7 @@ namespace Peacious.Identity.Application.Extensions
                     new AuthorizationCodeResponseTypeCommand(
                         request.ClientId,
                         request.RedirectUri,
+                        userId,
                         request.Scope,
                         request.State,
                         request.CodeChallange,

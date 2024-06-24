@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Peacious.Framework.CQRS;
 using Peacious.Framework.Results;
 using Peacious.Identity.Application.Extensions;
+using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Contracts.DTOs;
 using Peacious.Identity.Domain.Errors;
 
@@ -19,7 +20,9 @@ public class AuthController(ICommandExecutor commandExecutor) : ControllerBase
     [Authorize]
     public async Task<IActionResult> AuthorizeAsync(AuthorizationRequest request)
     {
-        var command = request.ToAuthorizationResponseTypeCommand();
+        var userId = User.Claims.FirstOrDefault(x => x.Type == ClaimType.UserId)?.Value;
+        
+        var command = request.ToAuthorizationResponseTypeCommand(userId!);
 
         if (command is null)
         {

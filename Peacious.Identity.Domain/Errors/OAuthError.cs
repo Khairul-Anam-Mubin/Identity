@@ -56,9 +56,9 @@ public class OAuthError
            "https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/");
 
     public static readonly Error UnauthorizedClient =
-        Error.Validation(
+        Error.Unauthorized(
            "unauthorized_client",
-           "an invalid request parameter is given",
+           "Client is not authorized",
            "https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/");
 
     public static readonly Error UnsupportedGrantType =

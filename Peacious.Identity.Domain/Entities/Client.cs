@@ -43,4 +43,9 @@ public class Client : Entity, IRepositoryItem
     {
         IsActive = false;
     }
+
+    public bool IsValidRedirectUri(string redirectUri)
+    {
+        return RedirectUri.Equals(redirectUri);
+    }
 }

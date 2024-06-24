@@ -26,8 +26,8 @@ public static class TokenRequestExtension
                     request.ClientId,
                     request.Code!,
                     request.RedirectUri!,
-                    request.CodeVerifier!,
-                    request.ClientSecret!),
+                    request.CodeVerifier,
+                    request.ClientSecret),
             GrantType.ClientCredentials => 
                 new CreateTokenForClientCredentialsGrantTypeCommand(
                     request.ClientId,
