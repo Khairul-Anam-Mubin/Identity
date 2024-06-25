@@ -62,8 +62,8 @@ public class AuthorizationCodeResponseTypeCommandHandler(
             client.Id,
             command.Scope,
             DateTime.UtcNow.AddSeconds(expirationTimeInSecond),
-            command.CodeChallange,
-            command.CodeChallangeMethod,
+            command.CodeChallenge,
+            command.CodeChallengeMethod,
             authorizationCodeLength
             );
 

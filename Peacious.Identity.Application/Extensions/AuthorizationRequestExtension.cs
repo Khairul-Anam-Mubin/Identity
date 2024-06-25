@@ -18,8 +18,8 @@ namespace Peacious.Identity.Application.Extensions
                         userId,
                         request.Scope,
                         request.State,
-                        request.CodeChallange,
-                        request.CodeChallangeMethod),
+                        request.CodeChallenge,
+                        request.CodeChallengeMethod),
                 ResponseType.Token => 
                     new AuthorizationCodeResponseTypeCommand(
                         request.ClientId,
@@ -27,8 +27,8 @@ namespace Peacious.Identity.Application.Extensions
                         userId,
                         request.Scope,
                         request.State,
-                        request.CodeChallange,
-                        request.CodeChallangeMethod),
+                        request.CodeChallenge,
+                        request.CodeChallengeMethod),
                 _ => null,
             };
         }

@@ -7,5 +7,5 @@ public record AuthorizationTokenResponseTypeCommand(
     string RedirectUri,
     string? Scope,
     string? State,
-    string? CodeChallange,
-    string? CodeChallangeMethod) : ICommand;
+    string? CodeChallenge,
+    string? CodeChallengeMethod) : ICommand;

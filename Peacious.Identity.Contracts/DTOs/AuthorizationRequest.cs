@@ -16,9 +16,9 @@ public record AuthorizationRequest
     public string? Scope { get; set; }
     public string? State { get; set; }
 
-    [JsonPropertyName("code_challange")]
-    public string? CodeChallange { get; set; }
+    [JsonPropertyName("code_challenge")]
+    public string? CodeChallenge { get; set; }
 
-    [JsonPropertyName("code_challange_method")]
-    public string? CodeChallangeMethod { get; set; }
+    [JsonPropertyName("code_challenge_method")]
+    public string? CodeChallengeMethod { get; set; }
 }

@@ -9,5 +9,5 @@ public record AuthorizationCodeResponseTypeCommand(
     string UserId,
     string? Scope,
     string? State,
-    string? CodeChallange,
-    string? CodeChallangeMethod) : ICommand<AuthorizationResponse>;
+    string? CodeChallenge,
+    string? CodeChallengeMethod) : ICommand<AuthorizationResponse>;

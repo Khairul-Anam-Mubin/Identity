@@ -52,9 +52,11 @@ public class CreateTokenForAuthorizationCodeGrantTypeCommandHandler(
             return OAuthError.UnauthorizedClient.Result<TokenResponse>();
         }
 
-        if (authorizationCodeGrant.HasCodeChallange())
+        var verifyCodeChallengeResult = authorizationCodeGrant.VerifyCodeChallenge(command.CodeVerifier);
+
+        if (verifyCodeChallengeResult.IsFailure)
         {
-            // verify code challange
+            return verifyCodeChallengeResult.ToResult<TokenResponse>();
         }
 
         if (authorizationCodeGrant.IsUsed)
@@ -64,7 +66,7 @@ public class CreateTokenForAuthorizationCodeGrantTypeCommandHandler(
 
         if (authorizationCodeGrant.IsExpired())
         {
-            // codegrant expired
+            return OAuthError.UnauthorizedClient.Result<TokenResponse>();
         }
 
         authorizationCodeGrant.SetAsUsed();
