@@ -44,8 +44,8 @@ public class AuthorizationCodeGrant : Entity, IRepositoryItem
 
     public bool HasCodeChallenge()
     {
-        return string.IsNullOrEmpty(CodeChallenge) 
-            || string.IsNullOrEmpty(CodeChallengeMethod);
+        return !string.IsNullOrEmpty(CodeChallenge) 
+            || !string.IsNullOrEmpty(CodeChallengeMethod);
     }
 
     public static string GenerateCodeChallenge(string codeVerifier)
