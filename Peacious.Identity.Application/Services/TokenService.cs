@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Peacious.Framework.Identity;
 using Peacious.Framework.Results;
+using Peacious.Framework.Results.Errors;
 using Peacious.Identity.Application.Extensions;
 using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Domain.Entities;

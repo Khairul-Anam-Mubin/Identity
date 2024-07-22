@@ -1,4 +1,4 @@
-﻿using Peacious.Framework.Results;
+﻿using Peacious.Framework.Results.Errors;
 
 namespace Peacious.Identity.Domain.Errors;
 

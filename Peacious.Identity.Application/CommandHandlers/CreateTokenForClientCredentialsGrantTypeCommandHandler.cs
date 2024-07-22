@@ -1,5 +1,6 @@
 ﻿using Peacious.Framework.CQRS;
 using Peacious.Framework.Results;
+using Peacious.Framework.Results.Errors;
 using Peacious.Identity.Application.Commands;
 using Peacious.Identity.Application.Services;
 using Peacious.Identity.Contracts.Constants;

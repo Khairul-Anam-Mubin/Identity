@@ -1,4 +1,5 @@
-﻿using Peacious.Framework.Results;
+﻿using Peacious.Framework.Results.Errors;
+using Peacious.Identity.Contracts.DTOs;
 
 namespace Peacious.Identity.Application.Extensions;
 

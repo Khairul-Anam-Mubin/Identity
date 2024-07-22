@@ -1,6 +1,7 @@
 ﻿using Peacious.Framework.DDD;
 using Peacious.Framework.ORM.Interfaces;
 using Peacious.Framework.Results;
+using Peacious.Framework.Results.Errors;
 using Peacious.Identity.Domain.Errors;
 using System.Text;
 

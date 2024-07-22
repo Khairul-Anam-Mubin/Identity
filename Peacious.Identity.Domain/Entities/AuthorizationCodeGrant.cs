@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Text;
 using Peacious.Framework.Results;
 using Peacious.Identity.Domain.Errors;
+using Peacious.Framework.Results.Errors;
 
 namespace Peacious.Identity.Domain.Entities;
 

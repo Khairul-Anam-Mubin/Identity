@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Peacious.Framework.CQRS;
-using Peacious.Framework.Results;
 using Peacious.Identity.Application.Extensions;
 using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Contracts.DTOs;
 using Peacious.Identity.Domain.Errors;
+using Peacious.Identity.Infrastructure.Extensions;
 
 namespace Peacious.Identity.Api.Controllers;
 
@@ -21,17 +21,17 @@ public class AuthController(ICommandExecutor commandExecutor) : ControllerBase
     public async Task<IActionResult> AuthorizeAsync(AuthorizationRequest request)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == ClaimType.UserId)?.Value;
-        
+
         var command = request.ToAuthorizationResponseTypeCommand(userId!);
 
         if (command is null)
         {
-            return OAuthError.InvalidResponseType.Result().ToObjectResult(ErrorResponseType.OAuth2Error);
+            return OAuthError.InvalidResponseType.ToOAuth2ActionResult();
         }
 
         var result = await _commandExecutor.ExecuteAsync(command);
-        
-        return result.ToObjectResult(ErrorResponseType.OAuth2Error);
+
+        return result.ToOAuth2ActionResult();
     }
 
     [HttpPost]
@@ -42,11 +42,11 @@ public class AuthController(ICommandExecutor commandExecutor) : ControllerBase
         
         if (command is null)
         {
-            return OAuthError.InvalidGrant.Result().ToObjectResult(ErrorResponseType.OAuth2Error);
+            return OAuthError.InvalidGrant.ToOAuth2ActionResult();
         }
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return result.ToObjectResult(ErrorResponseType.OAuth2Error);
+        return result.ToOAuth2ActionResult();
     }
 }

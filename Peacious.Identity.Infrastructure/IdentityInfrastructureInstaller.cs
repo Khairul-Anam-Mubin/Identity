@@ -23,7 +23,7 @@ public class IdentityInfrastructureInstaller : IServiceInstaller
         services.AddTransient<IRoleRepository, RoleRepository>();
         services.AddTransient<ITokenSessionRepository, TokenSessionRepository>();
         services.AddTransient<IAuthorizationCodeGrantRepository, AuthorizationCodeGrantRepository>();
-        services.AddKeyedTransient<IMigrationJob, ClientMigrationJob>("ClientMigrationJob");
+        services.AddKeyedTransient<IMigrationJob, ClientMigrationJob>(nameof(ClientMigrationJob));
         //services.AddSingleton(configuration.TryGetConfig<TokenConfig>("TokenConfig"));
     }
 }

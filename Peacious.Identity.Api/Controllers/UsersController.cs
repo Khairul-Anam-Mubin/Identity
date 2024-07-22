@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Peacious.Framework.CQRS;
 using Peacious.Framework.Results;
+using Peacious.Framework.Results.Adapters;
+using Peacious.Framework.Results.Errors.Adapters;
 using Peacious.Identity.Application.Commands;
 using Peacious.Identity.Contracts.DTOs;
 
@@ -27,7 +29,7 @@ public class UsersController(
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return result.ToObjectResult(ErrorResponseType.Standard);
+        return result.ToActionResult(DefaultActionResultAdapter.Instance, ProblemDetailsErrorActionResultAdapter.Instance);
     }
 
     [HttpGet]
