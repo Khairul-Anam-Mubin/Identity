@@ -1,31 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Peacious.Framework.Results;
 using Peacious.Framework.Results.Errors;
 using Peacious.Framework.Results.Errors.Adapters;
+using Peacious.Framework.Results.Errors.Strategies;
 using Peacious.Identity.Contracts.DTOs;
 
 namespace Peacious.Identity.Infrastructure.ErrorAdapters;
 
-public class OAuth2ErrorActionResultAdapter : IErrorActionResultAdapter
+public class OAuth2ErrorActionResultAdapter(
+    IErrorStatusCodeStrategy errorStatusCodeStrategy) : IErrorActionResultAdapter
 {
-    private static readonly object _lockObject = new();
-    private static IErrorActionResultAdapter? _instance;
-
-    public static IErrorActionResultAdapter Instance
-    {
-        get
-        {
-            if (_instance is not null)
-            {
-                return _instance;
-            }
-            lock (_lockObject)
-            {
-                _instance ??= new OAuth2ErrorActionResultAdapter();
-            }
-            return _instance;
-        }
-    }
+    private readonly IErrorStatusCodeStrategy _errorStatusCodeStrategy = errorStatusCodeStrategy;
 
     public IActionResult Convert(Error error)
     {
@@ -38,7 +22,7 @@ public class OAuth2ErrorActionResultAdapter : IErrorActionResultAdapter
 
         return new ObjectResult(errorResponse)
         {
-            StatusCode = StatusCodeProvider.GetStatusCode(error.Type)
+            StatusCode = _errorStatusCodeStrategy.GetErrorStatusCode(error.Type)
         };
     }
 }

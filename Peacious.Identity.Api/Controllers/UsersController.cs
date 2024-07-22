@@ -5,6 +5,7 @@ using Peacious.Framework.Results.Adapters;
 using Peacious.Framework.Results.Errors.Adapters;
 using Peacious.Identity.Application.Commands;
 using Peacious.Identity.Contracts.DTOs;
+using Peacious.Identity.Infrastructure.Extensions;
 
 namespace Peacious.Identity.Api.Controllers;
 
@@ -29,7 +30,7 @@ public class UsersController(
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return result.ToActionResult(DefaultActionResultAdapter.Instance, ProblemDetailsErrorActionResultAdapter.Instance);
+        return result.ToDefaultActionResult();
     }
 
     [HttpGet]
