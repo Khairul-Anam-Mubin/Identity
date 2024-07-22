@@ -11,16 +11,16 @@ public static class ErrorExtension
 {
     public static IActionResult ToDefaultActionResult(this Error error)
     {
-        return error.ToActionResult(new DefaultErrorActionResultAdapter(new DefaultErrorStatusCodeStrategy()));
+        return error.ToActionResult(new DefaultErrorActionResultAdapter(DefaultErrorStatusCodeStrategy.Instance));
     }
 
     public static IActionResult ToStandardActionResult(this Error error)
     {
-        return error.ToActionResult(new ProblemDetailsErrorActionResultAdapter(new DefaultErrorStatusCodeStrategy()));
+        return error.ToActionResult(new ProblemDetailsErrorActionResultAdapter(DefaultErrorStatusCodeStrategy.Instance));
     }
 
     public static IActionResult ToOAuth2ActionResult(this Error error)
     {
-        return error.ToActionResult(new OAuth2ErrorActionResultAdapter(new DefaultErrorStatusCodeStrategy()));
+        return error.ToActionResult(new OAuth2ErrorActionResultAdapter(DefaultErrorStatusCodeStrategy.Instance));
     }
 }

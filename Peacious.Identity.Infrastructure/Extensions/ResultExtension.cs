@@ -13,21 +13,21 @@ public static class ResultExtension
     public static IActionResult ToDefaultActionResult(this IResult result)
     {
         return result.ToActionResult(
-            new DefaultActionResultAdapter(new DefaultStatusCodeStrategy()), 
-            new DefaultErrorActionResultAdapter(new DefaultErrorStatusCodeStrategy()));
+            new DefaultActionResultAdapter(DefaultStatusCodeStrategy.Instance), 
+            new DefaultErrorActionResultAdapter(DefaultErrorStatusCodeStrategy.Instance));
     }
 
     public static IActionResult ToStandardActionResult(this IResult result)
     {
         return result.ToActionResult(
-            new DefaultActionResultAdapter(new DefaultStatusCodeStrategy()),
-            new ProblemDetailsErrorActionResultAdapter(new DefaultErrorStatusCodeStrategy()));
+            new DefaultActionResultAdapter(DefaultStatusCodeStrategy.Instance),
+            new ProblemDetailsErrorActionResultAdapter(DefaultErrorStatusCodeStrategy.Instance));
     }
 
     public static IActionResult ToOAuth2ActionResult(this IResult result)
     {
         return result.ToActionResult(
-            new DefaultActionResultAdapter(new DefaultStatusCodeStrategy()),
-            new OAuth2ErrorActionResultAdapter(new DefaultErrorStatusCodeStrategy()));
+            new DefaultActionResultAdapter(DefaultStatusCodeStrategy.Instance),
+            new OAuth2ErrorActionResultAdapter(DefaultErrorStatusCodeStrategy.Instance));
     }
 }
