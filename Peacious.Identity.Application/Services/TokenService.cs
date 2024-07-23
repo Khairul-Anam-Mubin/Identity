@@ -147,11 +147,11 @@ public class TokenService(
     {
         var user = await _userRepository.GetByIdAsync(userId);
 
-        if (user is null) return Result.Failure<string>(Error.NotFound("User not found while creating access token."));
+        if (user is null) return Error.NotFound("User not found while creating access token.").Result<string>();
 
         var client = await _clientRepository.GetByIdAsync(clientId);
 
-        if (client is null) return Result.Failure<string>(Error.NotFound("Client not found while creating access token."));
+        if (client is null) return Error.NotFound("Client not found while creating access token.").Result<string>();
 
         var accessTokenCreateResult = await CreateUserAccessTokenAsync(user, client);
 
@@ -229,11 +229,11 @@ public class TokenService(
     {
         var user = await _userRepository.GetByIdAsync(userId);
 
-        if (user is null) return Result.Failure<string>(Error.NotFound("User not found while creating refresh token."));
+        if (user is null) return Error.NotFound("User not found while creating refresh token.").Result<string>();
 
         var client = await _clientRepository.GetByIdAsync(clientId);
 
-        if (client is null) return Result.Failure<string>(Error.NotFound("Client not found while creating refresh token."));
+        if (client is null) return Error.NotFound("Client not found while creating refresh token.").Result<string>();
 
         var refreshTokenCreateResult = await CreateUserRefreshTokenAsync(user, client);
 
