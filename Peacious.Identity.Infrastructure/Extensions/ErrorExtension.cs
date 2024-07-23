@@ -10,11 +10,14 @@ namespace Peacious.Identity.Infrastructure.Extensions;
 public static class ErrorExtension
 {
     public static IActionResult ToDefaultActionResult(this Error error)
-        => error.ToActionResult(new DefaultErrorActionResultAdapter(DefaultErrorStatusCodeStrategy.Instance));
+        => error.ToActionResult(
+            new DefaultErrorActionResultAdapter(DefaultErrorStatusCodeStrategy.Instance));
 
     public static IActionResult ToStandardActionResult(this Error error)
-        => error.ToActionResult(new ProblemDetailsErrorActionResultAdapter(DefaultErrorStatusCodeStrategy.Instance));
+        => error.ToActionResult(
+            new ProblemDetailsErrorActionResultAdapter(DefaultErrorStatusCodeStrategy.Instance));
 
     public static IActionResult ToOAuth2ActionResult(this Error error)
-        => error.ToActionResult(new OAuth2ErrorActionResultAdapter(DefaultErrorStatusCodeStrategy.Instance));
+        => error.ToActionResult(
+            new OAuth2ErrorActionResultAdapter(DefaultErrorStatusCodeStrategy.Instance));
 }
