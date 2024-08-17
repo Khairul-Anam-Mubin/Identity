@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Peacious.Framework.CQRS;
+using Peacious.Framework.PermissionAuthorization;
 using Peacious.Identity.Application.Extensions;
+using Peacious.Identity.Application.Services;
 using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Contracts.DTOs;
 using Peacious.Identity.Domain.Errors;
@@ -11,18 +13,20 @@ namespace Peacious.Identity.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController(ICommandExecutor commandExecutor) : ControllerBase
+public class AuthController(
+    ICommandExecutor commandExecutor, IUserScopeContext userScopeContext) : ControllerBase
 {
     private readonly ICommandExecutor _commandExecutor = commandExecutor;
+    private readonly IUserScopeContext _userScopeContext = userScopeContext;
 
     [HttpPost]
     [Route("OAuth2/Authorize")]
     [Authorize]
     public async Task<IActionResult> AuthorizeAsync(AuthorizationRequest request)
     {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == ClaimType.UserId)?.Value;
+        var userId = _userScopeContext.User?.Id!;
 
-        var command = request.ToAuthorizationResponseTypeCommand(userId!);
+        var command = request.ToAuthorizationResponseTypeCommand(userId);
 
         if (command is null)
         {

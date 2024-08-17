@@ -8,6 +8,6 @@ public class AddUserPermissionsCommandHandler : ICommandHandler<AddUserPermissio
 {
     public async Task<IResult> Handle(AddUserPermissionsCommand request, CancellationToken cancellationToken)
     {
-        return Result.Success("User permissions added");
+        return Result.Success("CurrentUser permissions added");
     }
 }

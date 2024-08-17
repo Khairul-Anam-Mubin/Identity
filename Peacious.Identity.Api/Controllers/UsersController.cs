@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Peacious.Framework.CQRS;
 using Peacious.Identity.Application.Commands;
+using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Contracts.DTOs;
 using Peacious.Identity.Infrastructure.Extensions;
 
@@ -32,6 +34,7 @@ public class UsersController(
 
     [HttpGet]
     [Route("Info")]
+    [Authorize]
     public async Task<IActionResult> GetUserInfoAsyc()
     {
         return Ok("No Info for now");
@@ -50,23 +53,31 @@ public class UsersController(
 
     [HttpPost]
     [Route("Name/Change")]
+    [Authorize]
     public async Task<IActionResult> ChangeNameAsync(ChangeNameRequest request)
     {
+        var userId = User.Claims.First(x => x.Type == ClaimType.UserId).Value;
+
         var command = new ChangeNameCommand(
+            userId,
             request.FirstName, 
             request.LastName, 
             request.UserName);
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return Ok(result);
+        return result.ToStandardActionResult();
     }
 
     [HttpPost]
     [Route("Password/Change")]
+    [Authorize]
     public async Task<IActionResult> ChangePasswordAsync(ChangePasswordRequest request)
     {
+        var userId = User.Claims.First(x => x.Type == ClaimType.UserId).Value;
+
         var command = new ChangePasswordCommand(
+            userId,
             request.OldPassword,
             request.NewPassword);
 

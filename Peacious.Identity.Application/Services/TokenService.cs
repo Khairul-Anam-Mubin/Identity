@@ -1,5 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using Peacious.Framework.Identity;
+using Peacious.Framework.IdentityScope;
 using Peacious.Framework.Results;
 using Peacious.Framework.Results.Errors;
 using Peacious.Identity.Application.Extensions;
@@ -147,7 +147,7 @@ public class TokenService(
     {
         var user = await _userRepository.GetByIdAsync(userId);
 
-        if (user is null) return Error.NotFound("User not found while creating access token.").Result<string>();
+        if (user is null) return Error.NotFound("CurrentUser not found while creating access token.").Result<string>();
 
         var client = await _clientRepository.GetByIdAsync(clientId);
 
@@ -229,7 +229,7 @@ public class TokenService(
     {
         var user = await _userRepository.GetByIdAsync(userId);
 
-        if (user is null) return Error.NotFound("User not found while creating refresh token.").Result<string>();
+        if (user is null) return Error.NotFound("CurrentUser not found while creating refresh token.").Result<string>();
 
         var client = await _clientRepository.GetByIdAsync(clientId);
 

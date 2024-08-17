@@ -8,6 +8,6 @@ public class RemoveUserRolesCommandConsumer : ICommandHandler<RemoveUserRolesCom
 {
     public async Task<IResult> Handle(RemoveUserRolesCommand request, CancellationToken cancellationToken)
     {
-        return Result.Success("User roles removed");
+        return Result.Success("CurrentUser roles removed");
     }
 }

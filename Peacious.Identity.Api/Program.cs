@@ -1,5 +1,6 @@
 using Peacious.Framework;
 using Peacious.Framework.Extensions;
+using Peacious.Framework.IdentityScope;
 using Peacious.Framework.ORM.Migrations;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseIdentityScopeContext();
 
 app.UseHttpsRedirection();
 

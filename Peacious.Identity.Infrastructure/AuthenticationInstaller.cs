@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Peacious.Framework.Extensions;
-using Peacious.Framework.Identity;
+using Peacious.Framework.IdentityScope;
 using Peacious.Framework.ServiceInstaller;
 using System.Text;
 

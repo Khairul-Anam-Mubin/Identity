@@ -8,6 +8,6 @@ public class RemoveUserPermissionsCommandHandler : ICommandHandler<RemoveUserPer
 {
     public async Task<IResult> Handle(RemoveUserPermissionsCommand request, CancellationToken cancellationToken)
     {
-        return Result.Success("User permissions removed");
+        return Result.Success("CurrentUser permissions removed");
     }
 }

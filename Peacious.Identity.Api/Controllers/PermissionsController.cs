@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Peacious.Framework.CQRS;
 using Peacious.Identity.Application.Commands;
 using Peacious.Identity.Contracts.DTOs;
@@ -15,6 +16,7 @@ public class PermissionsController(
     private readonly IQueryExecutor _queryExecutor = queryExecutor;
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> CreatePermissionAsync(PermissionRequest request)
     {
         var command = new CreatePermissionCommand(request.Title);
