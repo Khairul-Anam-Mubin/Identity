@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Peacious.Framework.CQRS;
-using Peacious.Framework.PermissionAuthorization;
 using Peacious.Identity.Application.Extensions;
 using Peacious.Identity.Application.Services;
-using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Contracts.DTOs;
 using Peacious.Identity.Domain.Errors;
 using Peacious.Identity.Infrastructure.Extensions;
@@ -24,7 +22,7 @@ public class AuthController(
     [Authorize]
     public async Task<IActionResult> AuthorizeAsync(AuthorizationRequest request)
     {
-        var userId = _userScopeContext.User?.Id!;
+        var userId = _userScopeContext.User.Id!;
 
         var command = request.ToAuthorizationResponseTypeCommand(userId);
 

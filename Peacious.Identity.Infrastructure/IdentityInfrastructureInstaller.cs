@@ -21,8 +21,9 @@ public class IdentityInfrastructureInstaller : IServiceInstaller
         services.AddSwaggerGen();
         services.AddMongoDb();
         services.AddIdentityScopeContext();
-        services.AddPermissionAuthorization(new PermissionProvider());
+        services.AddPermissionAuthorization(typeof(PermissionProvider));
         services.AddScoped<IUserScopeContext, UserScopeContext>();
+
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IClientRepository, ClientRepository>();
         services.AddTransient<IPermissionRepository, PermissionRepository>();
