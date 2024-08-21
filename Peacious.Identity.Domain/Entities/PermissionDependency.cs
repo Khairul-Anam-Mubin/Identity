@@ -1,8 +1,9 @@
 ﻿using Peacious.Framework.DDD;
+using Peacious.Framework.ORM.Interfaces;
 
 namespace Peacious.Identity.Domain.Entities;
 
-public class PermissionDependency : Entity
+public class PermissionDependency : Entity, IRepositoryItem
 {
     public string PermissionId { get; private set; }
     public string ParentPermissionId { get; private set; }

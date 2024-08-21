@@ -24,6 +24,7 @@ public class AuthController(
     {
         var userId = _userScopeContext.User.Id!;
 
+        // todo: use some extensible transformer to avoid switch case
         var command = request.ToAuthorizationResponseTypeCommand(userId);
 
         if (command is null)
@@ -40,6 +41,7 @@ public class AuthController(
     [Route("OAuth2/Token")]
     public async Task<IActionResult> CreateTokenAsync(TokenRequest request)
     {
+        // todo: use some extensible transformer to avoid switch case
         var command = request.ToCreateTokenByGrantTypeCommand();
         
         if (command is null)

@@ -8,6 +8,6 @@ public static class PermissionExtension
 {
     public static Claim ToClaim(this Permission permission)
     {
-        return new Claim(ClaimType.Scope, permission.Title);
+        return new Claim(ClaimType.Scope, permission.Id);
     }
 }

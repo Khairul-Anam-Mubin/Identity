@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 #region ServiceRegistration
 
 builder
-    .AddCustomConfigurationJsonFile(builder.Configuration.TryGetConfig<string>("GlobalConfigPath"))
+    //.AddCustomConfigurationJsonFile(builder.Configuration.TryGetConfig<string>("GlobalConfigPath"))
     .AddAllAssembliesByAssemblyPrefix(builder.Configuration.TryGetConfig<string>("AssemblyPrefix"))
     .InstallServices(AssemblyCache.Instance.GetAddedAssemblies());
 

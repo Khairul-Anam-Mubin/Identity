@@ -1,4 +1,5 @@
 ﻿using Peacious.Framework.PermissionAuthorization;
+using Peacious.Identity.Contracts.Constants;
 
 namespace Peacious.Identity.Application.Services;
 
@@ -19,7 +20,7 @@ public class PermissionProvider(
             return false;
         }
 
-        var scope = _userScopeContext.GetClaim("Scope")?.Value;
+        var scope = _userScopeContext.GetClaim(ClaimType.Scope)?.Value;
 
         if (string.IsNullOrEmpty(scope))
         {

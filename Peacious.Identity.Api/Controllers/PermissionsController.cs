@@ -27,12 +27,14 @@ public class PermissionsController(
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetPermissionsAsync()
     {
         return Ok();
     }
 
     [HttpDelete]
+    [Authorize]
     public async Task<IActionResult> DeletePermissionsAsync(Permissions permissions)
     {
         var command = new DeletePermissionsCommand(permissions.Ids);
@@ -44,6 +46,7 @@ public class PermissionsController(
 
     [HttpPost]
     [Route("{permissionId}/Add-Permissions")]
+    [Authorize]
     public async Task<IActionResult> AddPermissionsToPermissionAsync([FromRoute] string permissionId, [FromBody] Permissions permissions)
     {
         var command = new AddChildPermissionsCommand(permissionId, permissions.Ids);

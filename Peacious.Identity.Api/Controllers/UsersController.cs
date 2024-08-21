@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Peacious.Framework.CQRS;
 using Peacious.Identity.Application.Commands;
-using Peacious.Identity.Contracts.Constants;
+using Peacious.Identity.Application.Queries;
 using Peacious.Identity.Contracts.DTOs;
 using Peacious.Identity.Infrastructure.Extensions;
 
@@ -29,7 +29,7 @@ public class UsersController(
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return result.ToDefaultActionResult();
+        return result.ToStandardActionResult();
     }
 
     [HttpGet]
@@ -37,7 +37,11 @@ public class UsersController(
     [Authorize]
     public async Task<IActionResult> GetUserInfoAsyc()
     {
-        return Ok("No Info for now");
+        var query = new UserInfoQuery();
+
+        var result = await _queryExecutor.ExecuteAsync(query);
+
+        return result.ToStandardActionResult();
     }
 
     [HttpPost]
@@ -48,7 +52,7 @@ public class UsersController(
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return Ok(result);
+        return result.ToStandardActionResult();
     }
 
     [HttpPost]
@@ -56,10 +60,7 @@ public class UsersController(
     [Authorize]
     public async Task<IActionResult> ChangeNameAsync(ChangeNameRequest request)
     {
-        var userId = User.Claims.First(x => x.Type == ClaimType.UserId).Value;
-
         var command = new ChangeNameCommand(
-            userId,
             request.FirstName, 
             request.LastName, 
             request.UserName);
@@ -74,16 +75,13 @@ public class UsersController(
     [Authorize]
     public async Task<IActionResult> ChangePasswordAsync(ChangePasswordRequest request)
     {
-        var userId = User.Claims.First(x => x.Type == ClaimType.UserId).Value;
-
         var command = new ChangePasswordCommand(
-            userId,
             request.OldPassword,
             request.NewPassword);
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return Ok(result);
+        return result.ToStandardActionResult();
     }
 
     [HttpPost]
@@ -94,7 +92,7 @@ public class UsersController(
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return Ok(result);
+        return result.ToStandardActionResult();
     }
 
     [HttpPost]
@@ -105,7 +103,7 @@ public class UsersController(
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return Ok(result);
+        return result.ToStandardActionResult();
     }
 
     [HttpPost]
@@ -116,7 +114,7 @@ public class UsersController(
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return Ok(result);
+        return result.ToStandardActionResult();
     }
 
     [HttpPost]
@@ -127,7 +125,7 @@ public class UsersController(
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return Ok(result);
+        return result.ToStandardActionResult();
     }
 
     [HttpPost]
@@ -138,6 +136,6 @@ public class UsersController(
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
-        return Ok(result);
+        return result.ToStandardActionResult();
     }
 }
