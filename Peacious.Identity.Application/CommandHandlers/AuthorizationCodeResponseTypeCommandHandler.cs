@@ -4,6 +4,7 @@ using Peacious.Framework.Extensions;
 using Peacious.Framework.Results;
 using Peacious.Framework.Results.Errors;
 using Peacious.Identity.Application.Commands;
+using Peacious.Identity.Application.Services;
 using Peacious.Identity.Contracts.DTOs;
 using Peacious.Identity.Domain.Entities;
 using Peacious.Identity.Domain.Errors;
@@ -12,6 +13,7 @@ using Peacious.Identity.Domain.Repositories;
 namespace Peacious.Identity.Application.CommandHandlers;
 
 public class AuthorizationCodeResponseTypeCommandHandler(
+    IUserScopeContext userScopeContext,
     IClientRepository clientRepository,
     IPermissionRepository permissionRepository,
     IAuthorizationCodeGrantRepository authorizationCodeGrantRepository,
@@ -23,7 +25,7 @@ public class AuthorizationCodeResponseTypeCommandHandler(
     private readonly IAuthorizationCodeGrantRepository _authorizationCodeGrantRepository = authorizationCodeGrantRepository;
     public async Task<IResult<AuthorizationResponse>> Handle(AuthorizationCodeResponseTypeCommand command, CancellationToken cancellationToken)
     {
-        var userId = command.UserId;
+        var userId = userScopeContext.User.Id;
 
         var client = await _clientRepository.GetByIdAsync(command.ClientId);
 

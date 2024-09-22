@@ -14,4 +14,9 @@ public class UserPermission : Entity, IRepositoryItem
         UserId = userId;
         PermissionId = permissionId;
     }
+
+    public static UserPermission Create(string userId, string permissionId)
+    {
+        return new UserPermission(userId, permissionId);
+    }
 }

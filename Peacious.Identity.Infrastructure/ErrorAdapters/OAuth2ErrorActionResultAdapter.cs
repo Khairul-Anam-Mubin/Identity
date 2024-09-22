@@ -15,9 +15,8 @@ public class OAuth2ErrorActionResultAdapter(
     {
         var errorResponse = new OAuth2ErrorResponse
         {
-            Error = error.Title!,
-            Description = error.Description,
-            Uri = error.Uri
+            Error = error.Type,
+            Description = error.Message
         };
 
         return new ObjectResult(errorResponse)

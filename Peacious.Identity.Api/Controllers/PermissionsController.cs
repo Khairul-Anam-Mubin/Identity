@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Peacious.Framework.CQRS;
 using Peacious.Identity.Application.Commands;
+using Peacious.Identity.Application.Queries;
 using Peacious.Identity.Contracts.DTOs;
+using Peacious.Identity.Infrastructure.Extensions;
 
 namespace Peacious.Identity.Api.Controllers;
 
@@ -19,7 +21,7 @@ public class PermissionsController(
     [Authorize]
     public async Task<IActionResult> CreatePermissionAsync(PermissionRequest request)
     {
-        var command = new CreatePermissionCommand(request.Title);
+        var command = new CreatePermissionCommand(request.Title, request.IsCustom);
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
@@ -30,7 +32,11 @@ public class PermissionsController(
     [Authorize]
     public async Task<IActionResult> GetPermissionsAsync()
     {
-        return Ok();
+        var query = new PermissionsQuery();
+
+        var result = await _queryExecutor.ExecuteAsync(query);
+
+        return result.ToStandardActionResult();
     }
 
     [HttpDelete]

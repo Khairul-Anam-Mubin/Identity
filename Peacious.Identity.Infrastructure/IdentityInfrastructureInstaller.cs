@@ -1,12 +1,16 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Peacious.Framework.ChainOfResponsibility;
+using Peacious.Framework.CQRS;
 using Peacious.Framework.IdentityScope;
 using Peacious.Framework.ORM;
 using Peacious.Framework.ORM.Migrations;
 using Peacious.Framework.PermissionAuthorization;
 using Peacious.Framework.ServiceInstaller;
 using Peacious.Identity.Application.Services;
+using Peacious.Identity.Contracts.DTOs;
 using Peacious.Identity.Domain.Repositories;
+using Peacious.Identity.Infrastructure.CommandAdpters;
 using Peacious.Identity.Infrastructure.Migrations;
 using Peacious.Identity.Infrastructure.Repositories;
 
@@ -30,7 +34,20 @@ public class IdentityInfrastructureInstaller : IServiceInstaller
         services.AddTransient<IRoleRepository, RoleRepository>();
         services.AddTransient<ITokenSessionRepository, TokenSessionRepository>();
         services.AddTransient<IAuthorizationCodeGrantRepository, AuthorizationCodeGrantRepository>();
+
         services.AddKeyedTransient<IMigrationJob, ClientMigrationJob>(nameof(ClientMigrationJob));
+        services.AddKeyedTransient<IMigrationJob, PermissionMigrationJob>(nameof(PermissionMigrationJob));
         //services.AddSingleton(configuration.TryGetConfig<TokenConfig>("TokenConfig"));
+
+        services.AddSingleton(
+            new TokenRequestToAuthorizationCodeGrantTypeCommandConverter()
+            .SetNext(new TokenRequestToClientCredentialsGrantTypeCommandConverter()
+            .SetNext(new TokenRequestToPasswordGrantTypeCommandConverter()
+            .SetNext(new TokenRequestToRefreshTokenGrantTypeCommandConverter()
+        ))));
+
+        services.AddSingleton<IAuthorizationRequestToCommandConverter>(
+            new AuthorizationRequestToAuthorizationCodeResponseTypeCommandConverter()
+        );
     }
 }

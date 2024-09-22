@@ -9,9 +9,8 @@ public static class ErrorExtension
     {
         return new OAuth2ErrorResponse
         {
-            Error = error.Title,
-            Description = error.Description,
-            Uri = error.Uri,
+            Error = error.Type,
+            Description = error.Message
         };
     }
 }

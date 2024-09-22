@@ -22,8 +22,6 @@ public class Permission : Entity, IRepositoryItem
 
     public static string GenerateId(string title, bool isCustom)
     {
-        if (isCustom) return title;
-
-        return Guid.NewGuid().ToString();
+        return title;
     }
 }

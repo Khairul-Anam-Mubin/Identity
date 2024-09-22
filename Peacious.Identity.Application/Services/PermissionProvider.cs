@@ -1,12 +1,15 @@
 ﻿using Peacious.Framework.PermissionAuthorization;
 using Peacious.Identity.Contracts.Constants;
+using Peacious.Identity.Domain.Repositories;
 
 namespace Peacious.Identity.Application.Services;
 
 public class PermissionProvider(
-    IUserScopeContext userScopeContext) : IPermissionProvider
+    IUserScopeContext userScopeContext,
+    IPermissionRepository permissionRepository) : IPermissionProvider
 {
     private readonly IUserScopeContext _userScopeContext = userScopeContext;
+    private readonly IPermissionRepository _permissionRepository = permissionRepository;
 
     public bool HasPermission(string permission)
     {
@@ -27,7 +30,12 @@ public class PermissionProvider(
             return false;
         }
 
-        var hasPermission = scope.Split(' ').Contains(permission);
+        var scopeList = scope.Split(' ').ToList();
+
+        var permissions = 
+            await _permissionRepository.GetCustomPermissionsByParentPermissionIdsAsync(scopeList);
+
+        var hasPermission = permissions.Exists(p => p.Title == permission);
 
         return await Task.FromResult(hasPermission);
     }

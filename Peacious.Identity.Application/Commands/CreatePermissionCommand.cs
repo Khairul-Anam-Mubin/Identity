@@ -2,4 +2,4 @@
 
 namespace Peacious.Identity.Application.Commands;
 
-public record CreatePermissionCommand(string Title) : ICommand;
+public record CreatePermissionCommand(string Title, bool IsCustom) : ICommand;

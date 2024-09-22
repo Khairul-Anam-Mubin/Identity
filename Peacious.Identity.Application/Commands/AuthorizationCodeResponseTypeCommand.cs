@@ -6,7 +6,6 @@ namespace Peacious.Identity.Application.Commands;
 public record AuthorizationCodeResponseTypeCommand(
     string ClientId,
     string RedirectUri,
-    string UserId,
     string? Scope,
     string? State,
     string? CodeChallenge,
