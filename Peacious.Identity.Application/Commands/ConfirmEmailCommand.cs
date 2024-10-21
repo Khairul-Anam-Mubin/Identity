@@ -2,6 +2,6 @@
 
 namespace Peacious.Identity.Application.Commands;
 
-public record VerifyUserEmailCommand(
+public record ConfirmEmailCommand(
     string Email, 
     string VerifierCode) : ICommand;

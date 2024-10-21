@@ -18,25 +18,31 @@ public class PermissionProvider(
 
     public async Task<bool> HasPermissionAsync(string permission)
     {
-        if (_userScopeContext.User == UserIdentity.Empty)
+        if (_userScopeContext.User == UserIdentity.Empty || string.IsNullOrEmpty(_userScopeContext.User.Id))
         {
             return false;
         }
 
-        var scope = _userScopeContext.GetClaim(ClaimType.Scope)?.Value;
-
-        if (string.IsNullOrEmpty(scope))
+        if (_userScopeContext.GetClaim(ClaimType.Source)?.Value == GrantType.AuthorizationCode)
         {
-            return false;
+            var scope = _userScopeContext.GetClaim(ClaimType.Scope)?.Value;
+
+            if (string.IsNullOrEmpty(scope))
+            {
+                return false;
+            }
+
+            var scopeList = scope.Split(' ').ToList();
+
+            return scopeList.Contains(permission); // get the permissions from scopeList and check the permission exists on it or not
         }
 
-        var scopeList = scope.Split(' ').ToList();
-
-        var permissions = 
-            await _permissionRepository.GetCustomPermissionsByParentPermissionIdsAsync(scopeList);
+        // todo : improvement on db calls and caching redis
+        var permissions =
+            await _permissionRepository.GetUserPermissionsAsync(_userScopeContext.User.Id);
 
         var hasPermission = permissions.Exists(p => p.Title == permission);
 
-        return await Task.FromResult(hasPermission);
+        return hasPermission;
     }
 }

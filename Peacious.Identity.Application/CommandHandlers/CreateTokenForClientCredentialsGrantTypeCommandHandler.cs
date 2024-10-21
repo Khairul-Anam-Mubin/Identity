@@ -2,11 +2,13 @@
 using Peacious.Framework.Results;
 using Peacious.Framework.Results.Errors;
 using Peacious.Identity.Application.Commands;
+using Peacious.Identity.Application.Extensions;
 using Peacious.Identity.Application.Services;
 using Peacious.Identity.Contracts.Constants;
-using Peacious.Identity.Contracts.Models;
+using Peacious.Identity.Contracts.DTOs;
 using Peacious.Identity.Domain.Errors;
 using Peacious.Identity.Domain.Repositories;
+using System.Security.Claims;
 
 namespace Peacious.Identity.Application.CommandHandlers;
 
@@ -41,7 +43,22 @@ public class CreateTokenForClientCredentialsGrantTypeCommandHandler(
             return OAuthError.InvalidUser(client.UserName).Result<TokenResponse>();
         }
 
-        var accessToken = await _tokenService.CreateClientAccessTokenAsync(user, client);
+        var role = string.Empty;
+
+        var accessTokenClaims = new List<Claim>
+        {
+            new Claim(ClaimType.JwtTokenId, Guid.NewGuid().ToString()),
+            new Claim(ClaimType.Role, role),
+            new Claim(ClaimType.Source, GrantType.ClientCredentials)
+        };
+        
+        var userClaims = user.ToClaims();
+        var clientClaims = client.ToClaims();
+        
+        accessTokenClaims.AddRange(clientClaims);
+        accessTokenClaims.AddRange(userClaims);
+
+        var accessToken = _tokenService.GenerateAccessToken(accessTokenClaims);
 
         var tokenResponse = new TokenResponse(
             TokenType.Bearer,

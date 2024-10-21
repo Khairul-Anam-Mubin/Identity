@@ -20,9 +20,17 @@ public class UserRegisterCommandHandler(IUserRepository userRepository) : IComma
             return Error.Conflict($"Email Address : {request.Email} already exist!").Result();
         }
 
+        var isUserNameExists = await _userRepository.IsUserEmailExistAsync(request.UserName);
+
+        if (isUserNameExists)
+        {
+            return Error.Conflict($"Username : {request.UserName} already exist!").Result();
+        }
+
         var user = User.Create(
             request.FirstName, 
             request.LastName,
+            request.UserName,
             request.Email, 
             request.Password);
 

@@ -4,9 +4,9 @@ using Peacious.Identity.Application.Commands;
 
 namespace Peacious.Identity.Application.CommandHandlers;
 
-public class VerifyUserEmailCommandHandler : ICommandHandler<VerifyUserEmailCommand>
+public class ConfirmEmailCommandHandler : ICommandHandler<ConfirmEmailCommand>
 {
-    public async Task<IResult> Handle(VerifyUserEmailCommand request, CancellationToken cancellationToken)
+    public async Task<IResult> Handle(ConfirmEmailCommand request, CancellationToken cancellationToken)
     {
         return Result.Success("Address verified");
     }

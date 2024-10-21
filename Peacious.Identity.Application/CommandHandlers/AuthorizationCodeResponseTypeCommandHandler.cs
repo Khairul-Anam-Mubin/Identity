@@ -27,6 +27,11 @@ public class AuthorizationCodeResponseTypeCommandHandler(
     {
         var userId = userScopeContext.User.Id;
 
+        if (string.IsNullOrEmpty(userId))
+        {
+            return OAuthError.NoAccess.Result<AuthorizationResponse>();
+        }
+
         var client = await _clientRepository.GetByIdAsync(command.ClientId);
 
         if (client is null)

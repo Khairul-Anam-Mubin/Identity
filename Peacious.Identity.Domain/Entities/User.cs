@@ -27,12 +27,11 @@ public class User : Entity, IRepositoryItem
         CreatedAt = DateTime.UtcNow;
     }
 
-    public static User Create(string firstName, string lastName, string emailAddress, string plainPassword)
+    public static User Create(string firstName, string lastName, string userName, string emailAddress, string plainPassword)
     {
         var name = new Name(firstName, lastName);
         var email = Email.Create(emailAddress);
         var password = Password.Create(plainPassword);
-        var userName = emailAddress;
         var user = new User(name, email, password, userName);
 
         user.RaiseDomainEvent(new UserCreatedDomainEvent(user.Id, user.UserName));

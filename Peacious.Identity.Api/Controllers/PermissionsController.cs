@@ -49,27 +49,4 @@ public class PermissionsController(
 
         return Ok(result);
     }
-
-    [HttpPost]
-    [Route("{permissionId}/Add-Permissions")]
-    [Authorize]
-    public async Task<IActionResult> AddPermissionsToPermissionAsync([FromRoute] string permissionId, [FromBody] Permissions permissions)
-    {
-        var command = new AddChildPermissionsCommand(permissionId, permissions.Ids);
-
-        var result = await _commandExecutor.ExecuteAsync(command);
-
-        return Ok(result);
-    }
-
-    [HttpPost]
-    [Route("{permissionId}/Remove-Permissions")]
-    public async Task<IActionResult> RemovePermissionsFromPermissionAsync([FromRoute] string permissionId, [FromBody] Permissions permissions)
-    {
-        var command = new RemoveChildPermissionsCommand(permissionId, permissions.Ids);
-
-        var result = await _commandExecutor.ExecuteAsync(command);
-
-        return Ok(result);
-    }
 }

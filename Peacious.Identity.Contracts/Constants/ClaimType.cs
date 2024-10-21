@@ -14,4 +14,5 @@ public class ClaimType
     public const string Audience = "aud";
     public const string Issuer = "iss";
     public const string ExpirationTime = "exp";
+    public const string Source = "source"; 
 }

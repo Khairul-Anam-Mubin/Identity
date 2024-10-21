@@ -2,23 +2,28 @@
 using Peacious.Framework.Results;
 using Peacious.Framework.Results.Errors;
 using Peacious.Identity.Application.Commands;
+using Peacious.Identity.Application.Extensions;
 using Peacious.Identity.Application.Services;
 using Peacious.Identity.Contracts.Constants;
-using Peacious.Identity.Contracts.Models;
+using Peacious.Identity.Contracts.DTOs;
+using Peacious.Identity.Domain.Entities;
 using Peacious.Identity.Domain.Errors;
 using Peacious.Identity.Domain.Repositories;
+using System.Security.Claims;
 
 namespace Peacious.Identity.Application.CommandHandlers;
 
 public class CreateTokenForPasswordGrantTypeCommandHandler(
     IClientRepository clientRepository,
     IUserRepository userRepository,
+    ITokenSessionRepository tokenSessionRepository,
     ITokenService tokenService) : ICommandHandler<CreateTokenForPasswordGrantTypeCommand, TokenResponse>
 {
     private readonly IClientRepository _clientRepository = clientRepository;
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ITokenService _tokenService = tokenService;
-    
+    private readonly ITokenSessionRepository _tokenSessionRepository = tokenSessionRepository;
+
     public async Task<IResult<TokenResponse>> Handle(
         CreateTokenForPasswordGrantTypeCommand command, 
         CancellationToken cancellationToken)
@@ -42,25 +47,44 @@ public class CreateTokenForPasswordGrantTypeCommandHandler(
             return OAuthError.InvalidCredentials.Result<TokenResponse>();
         }
 
-        var refreshTokenCreateResult = await _tokenService.CreateUserRefreshTokenAsync(user, client);
+        var tokenSession = TokenSession.Create(
+            user.Id,
+            client.Id,
+            string.Empty,
+            DateTime.UtcNow.AddSeconds(_tokenService.RefreshTokenExpirationTimeInSecond()),
+            GrantType.Password);
 
-        if (refreshTokenCreateResult.IsFailure || refreshTokenCreateResult.Value is null)
+        await _tokenSessionRepository.SaveAsync(tokenSession);
+
+        var refreshTokenClaims = new List<Claim>
         {
-            return OAuthError.ServerError.Result<TokenResponse>();
-        }
+            new Claim(ClaimType.JwtTokenId, tokenSession.Id)
+        };
 
-        var accessTokenCreateResult = await _tokenService.CreateUserAccessTokenAsync(user, client);
+        var userClaims = user.ToClaims();
+        var clientClaims = client.ToClaims();
 
-        if (accessTokenCreateResult.IsFailure || accessTokenCreateResult.Value is null)
+        refreshTokenClaims.AddRange(userClaims);
+        refreshTokenClaims.AddRange(clientClaims);
+
+        var refreshToken = _tokenService.GenerateRefreshToken(refreshTokenClaims);
+
+        var accessTokenClaims = new List<Claim>
         {
-            return OAuthError.ServerError.Result<TokenResponse>();
-        }
+            new Claim(ClaimType.JwtTokenId, Guid.NewGuid().ToString()),
+            new Claim(ClaimType.Source, tokenSession.GrantType ?? string.Empty)
+        };
+
+        accessTokenClaims.AddRange(clientClaims);
+        accessTokenClaims.AddRange(userClaims);
+
+        var accessToken = _tokenService.GenerateAccessToken(accessTokenClaims);
 
         var tokenResponse = new TokenResponse(
             TokenType.Bearer,
-            accessTokenCreateResult.Value, 
+            accessToken, 
             _tokenService.AccessTokenExpirationTimeInSecond(), 
-            refreshTokenCreateResult.Value, 
+            refreshToken, 
             null);
 
         return Result.Success(tokenResponse);

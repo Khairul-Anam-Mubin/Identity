@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Peacious.Identity.Contracts.Models;
+namespace Peacious.Identity.Contracts.DTOs;
 
 public class TokenResponse
 {

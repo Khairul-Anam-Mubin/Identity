@@ -20,20 +20,8 @@ public interface ITokenService
 
     string CreateUserAccessToken(User user, Client client, string? scope);
 
-    string CreateUserAccessToken(
-        User user, Client client, List<Role> roles, List<Permission> permissions);
-
-    Task<IResult<string>> CreateUserAccessTokenAsync(User user, Client client);
-
-    Task<IResult<string>> CreateUserAccessTokenAsync(string userId, string clientId);
-
-    string CreateUserAccessToken(TokenSession refreshTokenSession, List<Claim> refreshTokenClaims);
-
-    Task<string> CreateUserRefreshTokenAsync(User user, Client client, List<Role> roles, List<Permission> permissions);
-
-    Task<IResult<string>> CreateUserRefreshTokenAsync(User user, Client client);
-
-    Task<IResult<string>> CreateUserRefreshTokenAsync(string userId, string clientId);
-
     Task<string> CreateUserRefreshTokenAsync(TokenSession refreshTokenSession, List<Claim> refreshTokenClaims);
+
+    string GenerateRefreshToken(List<Claim> claims);
+    string GenerateAccessToken(List<Claim> claims);
 }

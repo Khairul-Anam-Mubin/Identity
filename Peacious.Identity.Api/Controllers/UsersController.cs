@@ -10,9 +10,7 @@ namespace Peacious.Identity.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UsersController(
-    ICommandExecutor commandExecutor, 
-    IQueryExecutor queryExecutor) : ControllerBase
+public class UsersController(ICommandExecutor commandExecutor, IQueryExecutor queryExecutor) : ControllerBase
 {
     private readonly ICommandExecutor _commandExecutor = commandExecutor;
     private readonly IQueryExecutor _queryExecutor = queryExecutor;
@@ -24,6 +22,7 @@ public class UsersController(
         var command = new UserRegisterCommand(
             request.FirstName, 
             request.LastName, 
+            request.UserName,
             request.Email, 
             request.Password);
 
@@ -44,11 +43,11 @@ public class UsersController(
         return result.ToStandardActionResult();
     }
 
-    [HttpPost]
-    [Route("Address/{email}/Verify")]
-    public async Task<IActionResult> VerifyUserEmailAsync(string email, [FromQuery] string code)
+    [HttpGet]
+    [Route("ConfirmEmail")]
+    public async Task<IActionResult> ConfirmEmailAsync([FromQuery] string email, [FromQuery] string code)
     {
-        var command = new VerifyUserEmailCommand(email, code);
+        var command = new ConfirmEmailCommand(email, code);
 
         var result = await _commandExecutor.ExecuteAsync(command);
 
@@ -56,22 +55,17 @@ public class UsersController(
     }
 
     [HttpPost]
-    [Route("Name/Change")]
-    [Authorize]
-    public async Task<IActionResult> ChangeNameAsync(ChangeNameRequest request)
+    [Route("ResendConfirmationEmail")]
+    public async Task<IActionResult> ResendConfirmationEmailAsync([FromBody] ResendConfirmationEmailRequest request)
     {
-        var command = new ChangeNameCommand(
-            request.FirstName, 
-            request.LastName, 
-            request.UserName);
-
-        var result = await _commandExecutor.ExecuteAsync(command);
-
-        return result.ToStandardActionResult();
+        // TODO
+        return Ok();
     }
 
+    #region Passwords
+
     [HttpPost]
-    [Route("Password/Change")]
+    [Route("ChangePassword")]
     [Authorize]
     public async Task<IActionResult> ChangePasswordAsync(ChangePasswordRequest request)
     {
@@ -85,7 +79,7 @@ public class UsersController(
     }
 
     [HttpPost]
-    [Route("Password/Forget")]
+    [Route("ForgotPassword")]
     public async Task<IActionResult> ForgetPasswordAsync(ForgetPasswordRequest request)
     {
         var command = new ForgetPasswordCommand(request.UserName);
@@ -96,29 +90,19 @@ public class UsersController(
     }
 
     [HttpPost]
-    [Route("{userId}/Roles/Add")]
-    public async Task<IActionResult> AddUserRolesAsync(string userId,[FromBody] Roles roles)
+    [Route("ResetPassword")]
+    public async Task<IActionResult> ResetPasswordAsync(ResetPasswordRequest request)
     {
-        var command = new AddUserRolesCommand(userId, roles.Ids);
-
-        var result = await _commandExecutor.ExecuteAsync(command);
-
-        return result.ToStandardActionResult();
+        // TODO
+        return Ok();
     }
 
-    [HttpPost]
-    [Route("{userId}/Roles/Remove")]
-    public async Task<IActionResult> RemoveUserRolesAsync(string userId, [FromBody] Roles roles)
-    {
-        var command = new RemoveUserRolesCommand(userId, roles.Ids);
+    #endregion
 
-        var result = await _commandExecutor.ExecuteAsync(command);
-
-        return result.ToStandardActionResult();
-    }
+    #region Permissions
 
     [HttpPost]
-    [Route("{userId}/Permissions/Add")]
+    [Route("{userId}/Permissions")]
     public async Task<IActionResult> AddUserPermissionsAsync(string userId, [FromBody] Permissions permissions)
     {
         var command = new AddUserPermissionsCommand(userId, permissions.Ids);
@@ -128,8 +112,8 @@ public class UsersController(
         return result.ToStandardActionResult();
     }
 
-    [HttpPost]
-    [Route("{userId}/Permissions/Remove")]
+    [HttpDelete]
+    [Route("{userId}/Permissions")]
     public async Task<IActionResult> RemoveUserPermissionsAsync(string userId, [FromBody] Permissions permissions)
     {
         var command = new RemoveUserPermissionsCommand(userId, permissions.Ids);
@@ -138,4 +122,20 @@ public class UsersController(
 
         return result.ToStandardActionResult();
     }
+
+    [HttpGet]
+    [Route("{userId}/Permissions")]
+    public async Task<IActionResult> GetUserPermissionsAsync([FromRoute] string userId)
+    {
+        var query = new UserPermissionsQuery()
+        {
+            UserId = userId
+        };
+
+        var result = await _queryExecutor.ExecuteAsync(query);
+
+        return result.ToStandardActionResult();
+    }
+
+    #endregion
 }

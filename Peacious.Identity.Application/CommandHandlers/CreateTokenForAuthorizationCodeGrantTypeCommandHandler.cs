@@ -2,18 +2,21 @@
 using Peacious.Framework.Results;
 using Peacious.Framework.Results.Errors;
 using Peacious.Identity.Application.Commands;
+using Peacious.Identity.Application.Extensions;
 using Peacious.Identity.Application.Services;
 using Peacious.Identity.Contracts.Constants;
-using Peacious.Identity.Contracts.Models;
+using Peacious.Identity.Contracts.DTOs;
 using Peacious.Identity.Domain.Entities;
 using Peacious.Identity.Domain.Errors;
 using Peacious.Identity.Domain.Repositories;
+using System.Security.Claims;
 
 namespace Peacious.Identity.Application.CommandHandlers;
 
 public class CreateTokenForAuthorizationCodeGrantTypeCommandHandler(
     IClientRepository clientRepository,
     IUserRepository userRepository,
+    ITokenSessionRepository tokenSessionRepository,
     IAuthorizationCodeGrantRepository authorizationCodeGrantRepository,
     ITokenService tokenService)
     : ICommandHandler<CreateTokenForAuthorizationCodeGrantTypeCommand, TokenResponse>
@@ -22,6 +25,7 @@ public class CreateTokenForAuthorizationCodeGrantTypeCommandHandler(
     private readonly IAuthorizationCodeGrantRepository _authorizationCodeGrantRepository = authorizationCodeGrantRepository;
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ITokenService _tokenService = tokenService;
+    private readonly ITokenSessionRepository _tokenSessionRepository = tokenSessionRepository;
 
     public async Task<IResult<TokenResponse>> Handle(CreateTokenForAuthorizationCodeGrantTypeCommand command, CancellationToken cancellationToken)
     {
@@ -81,20 +85,46 @@ public class CreateTokenForAuthorizationCodeGrantTypeCommandHandler(
             return OAuthError.ServerError.Result<TokenResponse>();
         }
 
-        var accessToken = _tokenService.CreateUserAccessToken(user, client, authorizationCodeGrant.Scope);
-        var refreshTokenCreatedResult = await _tokenService.CreateUserRefreshTokenAsync(user, client);
+        var tokenSession = TokenSession.Create(
+            user.Id,
+            client.Id,
+            authorizationCodeGrant.Scope,
+            DateTime.UtcNow.AddSeconds(_tokenService.RefreshTokenExpirationTimeInSecond()),
+            GrantType.AuthorizationCode);
 
-        if (refreshTokenCreatedResult.IsFailure)
+        await _tokenSessionRepository.SaveAsync(tokenSession);
+
+        var refreshTokenClaims = new List<Claim>
         {
-            return OAuthError.ServerError.Result<TokenResponse>();
-        }
-        
+            new Claim(ClaimType.JwtTokenId, tokenSession.Id)
+        };
+
+        var userClaims = user.ToClaims();
+        var clientClaims = client.ToClaims();
+
+        refreshTokenClaims.AddRange(userClaims);
+        refreshTokenClaims.AddRange(clientClaims);
+
+        var refreshToken = _tokenService.GenerateRefreshToken(refreshTokenClaims);
+
+        var accessTokenClaims = new List<Claim>
+        {
+            new Claim(ClaimType.JwtTokenId, Guid.NewGuid().ToString()),
+            new Claim(ClaimType.Scope, tokenSession.Scope ?? string.Empty),
+            new Claim(ClaimType.Source, tokenSession.GrantType ?? string.Empty)
+        };
+
+        accessTokenClaims.AddRange(clientClaims);
+        accessTokenClaims.AddRange(userClaims);
+
+        var accessToken = _tokenService.GenerateAccessToken(accessTokenClaims);
+
         var tokenResponse = new TokenResponse(
             TokenType.Bearer,
             accessToken,
             _tokenService.AccessTokenExpirationTimeInSecond(),
-            refreshTokenCreatedResult.Value,
-            authorizationCodeGrant.Scope);
+            refreshToken,
+            tokenSession.Scope);
 
         return Result.Success(tokenResponse);
     }

@@ -17,14 +17,12 @@ public class TokenService(
     ITokenSessionRepository tokenSessionRepository,
     IUserRepository userRepository,
     IClientRepository clientRepository,
-    IRoleRepository roleRepository,
     IPermissionRepository permissionRepository) : ITokenService
 {
     private readonly TokenConfig _tokenConfig = tokenConfig;
     private readonly IClientRepository _clientRepository = clientRepository;
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IPermissionRepository _permissionRepository = permissionRepository;
-    private readonly IRoleRepository _roleRepository = roleRepository;
     private readonly ITokenSessionRepository _tokenSessionRepository = tokenSessionRepository;
 
     public IResult ValidateToken(string jwtToken,
@@ -101,63 +99,6 @@ public class TokenService(
         return GenerateAccessToken(claims);
     }
 
-    public string CreateUserAccessToken(TokenSession refreshTokenSession, List<Claim> refreshTokenClaims)
-    {
-        var claims = GetDeterminedClaims(refreshTokenClaims);
-
-        claims.Add(new Claim(ClaimType.JwtTokenId, Guid.NewGuid().ToString()));
-
-        if (!string.IsNullOrEmpty(refreshTokenSession.Role))
-        {
-            var roles = refreshTokenSession.Role.Split(' ').ToList();
-
-            roles.ForEach(role => claims.Add(new Claim(ClaimType.Role, role)));
-        }
-
-        if (!string.IsNullOrEmpty(refreshTokenSession.Scope))
-        {
-            var scopes = refreshTokenSession.Scope.Split(' ').ToList();
-
-            scopes.ForEach(scope => claims.Add(new Claim(ClaimType.Scope, scope)));
-        }
-
-        return GenerateAccessToken(claims);
-    }
-
-    public string CreateUserAccessToken(User user, Client client, List<Role> roles, List<Permission> permissions)
-    {
-        var userClaims = ConvertToClaims(user, client, roles, permissions);
-
-        userClaims.Add(new Claim(ClaimType.JwtTokenId, Guid.NewGuid().ToString()));
-
-        return GenerateAccessToken(userClaims);
-    }
-
-    public async Task<IResult<string>> CreateUserAccessTokenAsync(User user, Client client)
-    {
-        var roles = await _roleRepository.GetUserRolesAsync(user.Id);
-        var permissions = await _permissionRepository.GetUserPermissionsAsync(user.Id);
-
-        var accessToken = CreateUserAccessToken(user, client, roles, permissions);
-
-        return Result.Success(accessToken, "");
-    }
-
-    public async Task<IResult<string>> CreateUserAccessTokenAsync(string userId, string clientId)
-    {
-        var user = await _userRepository.GetByIdAsync(userId);
-
-        if (user is null) return Error.NotFound("CurrentUser not found while creating access token.").Result<string>();
-
-        var client = await _clientRepository.GetByIdAsync(clientId);
-
-        if (client is null) return Error.NotFound("Client not found while creating access token.").Result<string>();
-
-        var accessTokenCreateResult = await CreateUserAccessTokenAsync(user, client);
-
-        return accessTokenCreateResult;
-    }
-
     public string GenerateRefreshToken(List<Claim> claims)
     {
         var token = TokenHelper.GenerateJwtToken(
@@ -177,8 +118,8 @@ public class TokenService(
                 refreshTokenSession.UserId,
                 refreshTokenSession.ClientId,
                 refreshTokenSession.Scope,
-                refreshTokenSession.Role,
-                DateTime.UtcNow.AddSeconds(_tokenConfig.RefreshTokenExpirationTimeInSec));
+                DateTime.UtcNow.AddSeconds(_tokenConfig.RefreshTokenExpirationTimeInSec),
+                refreshTokenSession.GrantType);
 
         await _tokenSessionRepository.SaveAsync(newTokenSession);
 
@@ -187,57 +128,6 @@ public class TokenService(
         claims.Add(new Claim(ClaimType.JwtTokenId, newTokenSession.Id));
 
         return GenerateRefreshToken(claims);
-    }
-
-    public async Task<string> CreateUserRefreshTokenAsync(
-        User user, Client client, List<Role> roles, List<Permission> permissions)
-    {
-        var tokenSession = TokenSession.Create(
-            user.Id,
-            client.Id,
-            permissions,
-            roles,
-            DateTime.UtcNow.AddSeconds(_tokenConfig.RefreshTokenExpirationTimeInSec));
-
-        await _tokenSessionRepository.SaveAsync(tokenSession);
-
-        var userClaims = user.ToClaims();
-        var clientClaims = client.ToClaims();
-
-        var refreshTokenClaims = new List<Claim>
-        {
-            new Claim(ClaimType.JwtTokenId, tokenSession.Id)
-        };
-
-        refreshTokenClaims.AddRange(userClaims);
-        refreshTokenClaims.AddRange(clientClaims);
-
-        return GenerateRefreshToken(refreshTokenClaims);
-    }
-
-    public async Task<IResult<string>> CreateUserRefreshTokenAsync(User user, Client client)
-    {
-        var roles = await _roleRepository.GetUserRolesAsync(user.Id);
-        var permissions = await _permissionRepository.GetUserPermissionsAsync(user.Id);
-
-        var refreshToken = await CreateUserRefreshTokenAsync(user, client, roles, permissions);
-
-        return Result.Success(refreshToken, "");
-    }
-
-    public async Task<IResult<string>> CreateUserRefreshTokenAsync(string userId, string clientId)
-    {
-        var user = await _userRepository.GetByIdAsync(userId);
-
-        if (user is null) return Error.NotFound("CurrentUser not found while creating refresh token.").Result<string>();
-
-        var client = await _clientRepository.GetByIdAsync(clientId);
-
-        if (client is null) return Error.NotFound("Client not found while creating refresh token.").Result<string>();
-
-        var refreshTokenCreateResult = await CreateUserRefreshTokenAsync(user, client);
-
-        return refreshTokenCreateResult;
     }
 
     public int AccessTokenExpirationTimeInSecond() => _tokenConfig.ExpirationTimeInSec;
@@ -251,28 +141,6 @@ public class TokenService(
                x.Type != ClaimType.Issuer &&
                x.Type != ClaimType.ExpirationTime)
            .ToList();
-    }
-
-    private List<Claim> ConvertToClaims(
-        User user, Client client, List<Role> roles, List<Permission> permissions)
-    {
-        var scopeClaims =
-            permissions.Select(permission => permission.ToClaim());
-
-        var roleClaims = roles.Select(role => role.ToClaim());
-
-        var userClaims = user.ToClaims();
-
-        var clientClaims = client.ToClaims();
-
-        var allClaims = new List<Claim>();
-
-        allClaims.AddRange(clientClaims);
-        allClaims.AddRange(userClaims);
-        allClaims.AddRange(roleClaims);
-        allClaims.AddRange(scopeClaims);
-
-        return allClaims;
     }
 
     private TokenValidationParameters GetTokenValidationParameters(

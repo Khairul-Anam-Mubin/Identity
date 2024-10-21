@@ -1,6 +1,5 @@
 ﻿using Peacious.Framework.CQRS;
 using Peacious.Identity.Contracts.DTOs;
-using Peacious.Identity.Contracts.Models;
 
 namespace Peacious.Identity.Infrastructure.CommandAdpters;
 

@@ -2,7 +2,6 @@
 using Peacious.Identity.Application.Commands;
 using Peacious.Identity.Contracts.Constants;
 using Peacious.Identity.Contracts.DTOs;
-using Peacious.Identity.Contracts.Models;
 
 namespace Peacious.Identity.Infrastructure.CommandAdpters;
 
