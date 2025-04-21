@@ -56,4 +56,9 @@ public class TokenSession : Entity, IRepositoryItem
     {
         return ExpireAt < DateTime.UtcNow;
     }
+
+    public string GetRepositoryName()
+    {
+        return nameof(TokenSession);
+    }
 }

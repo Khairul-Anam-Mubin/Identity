@@ -109,4 +109,9 @@ public class AuthorizationCodeGrant : Entity, IRepositoryItem
     {
         return CheckSumGenerator.GetCheckSum($"{clientId}-{code}");
     }
+
+    public string GetRepositoryName()
+    {
+        return nameof(AuthorizationCodeGrant);
+    }
 }

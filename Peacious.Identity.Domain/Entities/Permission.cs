@@ -24,4 +24,9 @@ public class Permission : Entity, IRepositoryItem
     {
         return title;
     }
+
+    public string GetRepositoryName()
+    {
+        return nameof(Permission);
+    }
 }

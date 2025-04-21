@@ -16,7 +16,6 @@ public class UsersController(ICommandExecutor commandExecutor, IQueryExecutor qu
     private readonly IQueryExecutor _queryExecutor = queryExecutor;
 
     [HttpPost]
-    [Route("Register")]
     public async Task<IActionResult> UserRegisterAsync(UserRegistrationRequest request)
     {
         var command = new UserRegisterCommand(

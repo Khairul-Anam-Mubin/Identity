@@ -6,6 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Peacious.Framework" Version="2.3.0-rc" />
+		<PackageReference Include="Peacious.Framework" Version="3.0.0-rc" />
 	</ItemGroup>
 </Project>

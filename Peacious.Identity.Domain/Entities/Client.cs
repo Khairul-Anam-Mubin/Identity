@@ -48,4 +48,9 @@ public class Client : Entity, IRepositoryItem
     {
         return RedirectUri.Equals(redirectUri);
     }
+
+    public string GetRepositoryName()
+    {
+        return nameof(Client);
+    }
 }

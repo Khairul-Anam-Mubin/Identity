@@ -19,4 +19,9 @@ public class UserPermission : Entity, IRepositoryItem
     {
         return new UserPermission(userId, permissionId);
     }
+
+    public string GetRepositoryName()
+    {
+        return nameof(UserPermission);
+    }
 }

@@ -76,4 +76,9 @@ public class User : Entity, IRepositoryItem
 
         return Result.Success();
     }
+
+    public string GetRepositoryName()
+    {
+        return nameof(User);
+    }
 }
